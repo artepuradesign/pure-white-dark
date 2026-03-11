@@ -4302,7 +4302,13 @@ Todos os direitos reservados.`;
           {/* PIS */}
           {(!isSlimMode || isExclusiveMode) && showPisSection && pisCount > 0 && (
             <div id="pis-section">
-              
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('pis')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
               <PisSection pis={result.pis} />
             </div>
           )}
