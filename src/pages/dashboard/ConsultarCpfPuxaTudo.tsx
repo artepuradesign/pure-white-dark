@@ -833,6 +833,8 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
   const [editModalConfig, setEditModalConfig] = useState<EditModalConfig | null>(null);
   const [editFormData, setEditFormData] = useState<Record<string, string>>({});
   const [savingEdit, setSavingEdit] = useState(false);
+  const [loadingEditData, setLoadingEditData] = useState(false);
+  const [sectionsRefreshKey, setSectionsRefreshKey] = useState(0);
 
   // Carregar título/descrição do módulo (do cadastro)
   useEffect(() => {
