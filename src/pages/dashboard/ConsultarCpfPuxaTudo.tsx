@@ -4157,7 +4157,7 @@ Todos os direitos reservados.`;
 
           {showEmailsSection && (
             <div id="emails-section" className={emailsCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('Emails', emailsCount, () => openEditModal('emails'))}
+              
               <EmailsSection key={`emails-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEmailsCount} />
             </div>
           )}
