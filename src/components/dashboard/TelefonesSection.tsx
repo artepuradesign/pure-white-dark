@@ -23,9 +23,10 @@ interface TelefonesSectionProps {
   onCountChange?: (count: number) => void;
   /** Modo compacto para telas específicas (ex.: CPF Simples) */
   compact?: boolean;
+  onEdit?: () => void;
 }
 
-const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChange, compact = false }) => {
+const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChange, compact = false, onEdit }) => {
   const { isLoading, getTelefonesByCpfId } = useBaseTelefone();
   const [telefones, setTelefones] = useState<BaseTelefone[]>([]);
   const [didLoad, setDidLoad] = useState(false);
