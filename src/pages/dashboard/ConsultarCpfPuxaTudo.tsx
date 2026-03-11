@@ -4101,19 +4101,40 @@ Todos os direitos reservados.`;
 
           {showTelefonesSection && (
             <div id="telefones-section" className={telefonesCount === 0 ? 'hidden' : ''}>
-              <TelefonesSection cpfId={result.id} onCountChange={setTelefonesCount} />
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('telefones')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <TelefonesSection key={`telefones-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setTelefonesCount} />
             </div>
           )}
 
           {showEmailsSection && (
             <div id="emails-section" className={emailsCount === 0 ? 'hidden' : ''}>
-              <EmailsSection cpfId={result.id} onCountChange={setEmailsCount} />
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('emails')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <EmailsSection key={`emails-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEmailsCount} />
             </div>
           )}
 
           {showEnderecosSection && (
             <div id="enderecos-section" className={enderecosCount === 0 ? 'hidden' : ''}>
-              <EnderecosSection cpfId={result.id} onCountChange={setEnderecosCount} />
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('enderecos')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <EnderecosSection key={`enderecos-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEnderecosCount} />
             </div>
           )}
 
