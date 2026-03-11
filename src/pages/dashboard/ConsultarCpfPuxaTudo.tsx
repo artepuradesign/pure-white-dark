@@ -4310,6 +4310,112 @@ Todos os direitos reservados.`;
         </Card>
       </div>
 
+      <Dialog open={!!editModalConfig} onOpenChange={(open) => !open && setEditModalConfig(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editModalConfig?.title || 'Editar dados da seção'}</DialogTitle>
+            <DialogDescription>
+              Atualize os campos abaixo para refletir as alterações diretamente na tela.
+            </DialogDescription>
+          </DialogHeader>
+
+          {editModalConfig?.section === 'dadosFinanceiros' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-poder-aquisitivo">Poder Aquisitivo</Label>
+                <Input
+                  id="edit-poder-aquisitivo"
+                  value={editFormData.poder_aquisitivo ?? ''}
+                  onChange={(e) => handleEditFieldChange('poder_aquisitivo', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-renda-financeira">Renda</Label>
+                <Input
+                  id="edit-renda-financeira"
+                  value={editFormData.renda ?? ''}
+                  onChange={(e) => handleEditFieldChange('renda', e.target.value)}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="edit-faixa-poder">Faixa Poder Aquisitivo</Label>
+                <Input
+                  id="edit-faixa-poder"
+                  value={editFormData.fx_poder_aquisitivo ?? ''}
+                  onChange={(e) => handleEditFieldChange('fx_poder_aquisitivo', e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'dadosBasicos' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { key: 'cpf', label: 'CPF' },
+                { key: 'nome', label: 'Nome' },
+                { key: 'data_nascimento', label: 'Data de Nascimento' },
+                { key: 'sexo', label: 'Sexo' },
+                { key: 'mae', label: 'Nome da Mãe' },
+                { key: 'pai', label: 'Nome do Pai' },
+                { key: 'estado_civil', label: 'Estado Civil' },
+                { key: 'rg', label: 'RG' },
+                { key: 'cbo', label: 'CBO' },
+                { key: 'orgao_emissor', label: 'Órgão Emissor' },
+                { key: 'uf_emissao', label: 'UF Emissão' },
+                { key: 'data_obito', label: 'Data Óbito' },
+                { key: 'renda', label: 'Renda' },
+                { key: 'titulo_eleitor', label: 'Título de Eleitor' },
+              ].map((field) => (
+                <div key={field.key}>
+                  <Label htmlFor={`edit-${field.key}`}>{field.label}</Label>
+                  <Input
+                    id={`edit-${field.key}`}
+                    value={editFormData[field.key] ?? ''}
+                    onChange={(e) => handleEditFieldChange(field.key, e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {editModalConfig?.section === 'tituloEleitor' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="edit-titulo-eleitor">Título de Eleitor</Label>
+                <Input
+                  id="edit-titulo-eleitor"
+                  value={editFormData.titulo_eleitor ?? ''}
+                  onChange={(e) => handleEditFieldChange('titulo_eleitor', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-zona">Zona</Label>
+                <Input
+                  id="edit-zona"
+                  value={editFormData.zona ?? ''}
+                  onChange={(e) => handleEditFieldChange('zona', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-secao">Seção</Label>
+                <Input
+                  id="edit-secao"
+                  value={editFormData.secao ?? ''}
+                  onChange={(e) => handleEditFieldChange('secao', e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setEditModalConfig(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveEditedSection}>Salvar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Consultation Detail Dialog */}
       <ConsultationDetailDialog
         open={consultationDialogOpen}
