@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Phone, Copy, Pencil } from 'lucide-react';
+import { Phone, Copy, Pencil, Plus } from 'lucide-react';
 import { useBaseTelefone } from '@/hooks/useBaseTelefone';
 import { BaseTelefone } from '@/services/baseTelefoneService';
 import { toast } from "sonner";
-import { formatDateOnly, formatPhone } from '@/utils/formatters';
+import { formatDateOnly } from '@/utils/formatters';
 
-const toPhoneDigits = (t: BaseTelefone) => `${t.ddd || ''}${t.telefone || ''}`.replace(/\D/g, '');
 const formatLocalPhone = (value: string) => {
   const digits = (value || '').replace(/\D/g, '');
   if (digits.length === 8) return digits.replace(/(\d{4})(\d{4})/, '$1-$2');
@@ -21,12 +20,13 @@ const formatLocalPhone = (value: string) => {
 interface TelefonesSectionProps {
   cpfId?: number;
   onCountChange?: (count: number) => void;
-  /** Modo compacto para telas específicas (ex.: CPF Simples) */
   compact?: boolean;
   onEdit?: () => void;
+  onEditRecord?: (record: BaseTelefone) => void;
+  onAddRecord?: () => void;
 }
 
-const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChange, compact = false, onEdit }) => {
+const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChange, compact = false, onEdit, onEditRecord, onAddRecord }) => {
   const { isLoading, getTelefonesByCpfId } = useBaseTelefone();
   const [telefones, setTelefones] = useState<BaseTelefone[]>([]);
   const [didLoad, setDidLoad] = useState(false);
@@ -39,9 +39,7 @@ const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChang
       setDidLoad(false);
       if (cpfId) {
         const result = await getTelefonesByCpfId(cpfId);
-        if (result) {
-          setTelefones(result);
-        }
+        setTelefones(result || []);
         setDidLoad(true);
       } else {
         setTelefones([]);
@@ -53,15 +51,14 @@ const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChang
   }, [cpfId, getTelefonesByCpfId]);
 
   useEffect(() => {
-    // Evitar emitir contagem antes do primeiro load (previne validação/cobrança incorreta)
     if (!didLoad) return;
     onCountChange?.(telefones.length);
   }, [didLoad, onCountChange, telefones.length]);
 
   const copyTelefonesData = () => {
     if (telefones.length === 0) return;
-    
-    const dados = telefones.map((tel, idx) => 
+
+    const dados = telefones.map((tel, idx) =>
       `Telefone ${idx + 1}:\n` +
       `DDD: ${tel.ddd || '-'}\n` +
       `Número: ${formatLocalPhone(tel.telefone) || '-'}\n` +
@@ -88,7 +85,7 @@ const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChang
         </CardHeader>
         <CardContent className="space-y-4 p-4 md:p-6">
           <div className="text-center py-4 text-muted-foreground">
-            <div className="animate-spin mx-auto w-6 h-6 border-2 border-primary border-t-transparent rounded-full mb-2"></div>
+            <div className="animate-spin mx-auto w-6 h-6 border-2 border-primary border-t-transparent rounded-full mb-2" />
             <p className="text-sm">Carregando telefones...</p>
           </div>
         </CardContent>
@@ -107,115 +104,84 @@ const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChang
 
           <div className="flex items-center gap-2 flex-shrink-0">
             {onEdit && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onEdit}
-                className="h-8 w-8"
-                title="Editar dados da seção"
-              >
+              <Button variant="ghost" size="icon" onClick={onEdit} className="h-8 w-8" title="Editar dados da seção">
                 <Pencil className="h-4 w-4" />
               </Button>
             )}
 
-            {telefones.length > 0 && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={copyTelefonesData}
-                className="h-8 w-8"
-                title="Copiar dados da seção"
-              >
+            {onAddRecord && (
+              <Button variant="ghost" size="icon" onClick={onAddRecord} className="h-8 w-8" title="Adicionar novo registro">
+                <Plus className="h-4 w-4" />
+              </Button>
+            )}
+
+            {hasData && (
+              <Button variant="ghost" size="icon" onClick={copyTelefonesData} className="h-8 w-8" title="Copiar dados da seção">
                 <Copy className="h-4 w-4" />
               </Button>
             )}
 
             <div className="relative inline-flex">
-              <Badge variant="secondary" className="uppercase tracking-wide">
+              <Badge variant="secondary" className={hasData ? 'bg-success text-success-foreground uppercase tracking-wide pr-4' : 'uppercase tracking-wide pr-4'}>
                 Online
               </Badge>
-              {telefones.length > 0 ? (
-                <span
-                  className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                  aria-label={`Quantidade de telefones: ${telefones.length}`}
-                >
+              {hasData && (
+                <span className="absolute -top-2 -right-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground">
                   {telefones.length}
                 </span>
-              ) : null}
+              )}
             </div>
           </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-4 p-4 md:p-6">
-        {telefones.length > 0 ? (
+        {hasData ? (
           <div className="space-y-4">
             {telefones.map((telefone, index) => (
-              <div key={telefone.id}>
-                {index > 0 && <div className="border-t pt-3"></div>}
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  <div>
-                      <Label htmlFor={`ddd_${telefone.id}`}>DDD</Label>
-                      <Input
-                        id={`ddd_${telefone.id}`}
-                        value={telefone.ddd || '-'}
-                        disabled
-                        className="bg-muted text-[14px] md:text-sm"
-                      />
-                    </div>
+              <div key={telefone.id} className="rounded-lg border border-border bg-muted/20 p-4 space-y-4">
+                <div className="flex items-center justify-between gap-2">
+                  <Badge variant="outline">Registro {index + 1}</Badge>
+                  {onEditRecord && (
+                    <Button variant="ghost" size="icon" className="h-8 w-8" title={`Editar registro ${index + 1}`} onClick={() => onEditRecord(telefone)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
 
-                    <div>
-                      <Label htmlFor={`tel_${telefone.id}`}>Telefone</Label>
-                      <Input
-                        id={`tel_${telefone.id}`}
-                        value={formatLocalPhone(telefone.telefone) || '-'}
-                        disabled
-                        className="bg-muted text-[14px] md:text-sm"
-                      />
-                    </div>
-                  
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor={`tipo_${telefone.id}`}>Tipo</Label>
-                    <Input
-                      id={`tipo_${telefone.id}`}
-                        value={telefone.tipo_texto || '-'}
-                      disabled
-                        className="bg-muted uppercase text-[14px] md:text-sm"
-                    />
+                    <Label htmlFor={`ddd_${telefone.id}`}>DDD</Label>
+                    <Input id={`ddd_${telefone.id}`} value={telefone.ddd || '-'} disabled className="bg-muted text-[14px] md:text-sm" />
                   </div>
 
-                  {!compact ? (
+                  <div>
+                    <Label htmlFor={`tel_${telefone.id}`}>Telefone</Label>
+                    <Input id={`tel_${telefone.id}`} value={formatLocalPhone(telefone.telefone) || '-'} disabled className="bg-muted text-[14px] md:text-sm" />
+                  </div>
+
+                  <div>
+                    <Label htmlFor={`tipo_${telefone.id}`}>Tipo</Label>
+                    <Input id={`tipo_${telefone.id}`} value={telefone.tipo_texto || '-'} disabled className="bg-muted uppercase text-[14px] md:text-sm" />
+                  </div>
+
+                  {!compact && (
                     <>
                       <div>
                         <Label htmlFor={`class_${telefone.id}`}>Classificação</Label>
-                        <Input
-                          id={`class_${telefone.id}`}
-                          value={telefone.classificacao || '-'}
-                          disabled
-                          className="bg-muted uppercase text-[14px] md:text-sm"
-                        />
+                        <Input id={`class_${telefone.id}`} value={telefone.classificacao || '-'} disabled className="bg-muted uppercase text-[14px] md:text-sm" />
                       </div>
 
                       <div>
                         <Label htmlFor={`sigilo_${telefone.id}`}>Sigilo</Label>
-                        <Input
-                          id={`sigilo_${telefone.id}`}
-                          value={telefone.sigilo ? 'Sim' : 'Não'}
-                          disabled
-                          className="bg-muted text-[14px] md:text-sm"
-                        />
+                        <Input id={`sigilo_${telefone.id}`} value={telefone.sigilo ? 'Sim' : 'Não'} disabled className="bg-muted text-[14px] md:text-sm" />
                       </div>
 
                       <div>
                         <Label htmlFor={`dt_inc_${telefone.id}`}>Data Inclusão</Label>
-                        <Input
-                          id={`dt_inc_${telefone.id}`}
-                          value={telefone.data_inclusao ? formatDateOnly(telefone.data_inclusao) : '-'}
-                          disabled
-                          className="bg-muted text-[14px] md:text-sm"
-                        />
+                        <Input id={`dt_inc_${telefone.id}`} value={telefone.data_inclusao ? formatDateOnly(telefone.data_inclusao) : '-'} disabled className="bg-muted text-[14px] md:text-sm" />
                       </div>
                     </>
-                  ) : null}
+                  )}
                 </div>
               </div>
             ))}
@@ -223,9 +189,7 @@ const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChang
         ) : (
           <div className="text-center py-4 text-muted-foreground">
             <Phone className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-            <p className="text-sm">
-              Nenhum telefone adicional encontrado para este CPF
-            </p>
+            <p className="text-sm">Nenhum telefone adicional encontrado para este CPF</p>
           </div>
         )}
       </CardContent>
