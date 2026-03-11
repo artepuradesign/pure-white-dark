@@ -142,18 +142,22 @@ const MenuSuperior = () => {
 
             <div className="hidden md:flex items-center space-x-4">
               <nav className="hidden lg:flex items-center space-x-1">
-                <Link to="/">
-                  <Button variant="ghost" size="sm" className={cn("text-muted-foreground hover:text-foreground", liquidGlassConfig.enabled && "hover:bg-white/10")}>Início</Button>
-                </Link>
+                {!isHomePage && (
+                  <Link to="/">
+                    <Button variant="ghost" size="sm" className={cn("text-muted-foreground hover:text-foreground", liquidGlassConfig.enabled && "hover:bg-white/10")}>Início</Button>
+                  </Link>
+                )}
                 <Link to="/modulos">
                   <Button variant="ghost" size="sm" className={cn("text-muted-foreground hover:text-foreground", liquidGlassConfig.enabled && "hover:bg-white/10")}>Módulos</Button>
                 </Link>
                 <Link to="/planos-publicos">
                   <Button variant="ghost" size="sm" className={cn("text-muted-foreground hover:text-foreground", liquidGlassConfig.enabled && "hover:bg-white/10")}>Planos</Button>
                 </Link>
-                <Link to="/dashboard">
-                  <Button variant="ghost" size="sm" className={cn("menu-paineis-link text-muted-foreground hover:text-foreground font-semibold", liquidGlassConfig.enabled && "hover:bg-white/10")}>Painéis</Button>
-                </Link>
+                {!isDashboardPage && (
+                  <Link to="/dashboard">
+                    <Button variant="ghost" size="sm" className={cn("menu-paineis-link text-muted-foreground hover:text-foreground font-semibold", liquidGlassConfig.enabled && "hover:bg-white/10")}>Painéis</Button>
+                  </Link>
+                )}
               </nav>
 
               {user ? (
