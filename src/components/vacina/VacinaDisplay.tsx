@@ -12,9 +12,10 @@ import { toast } from "sonner";
 interface VacinaDisplayProps {
   cpfId: number;
   onCountChange?: (count: number) => void;
+  onEdit?: () => void;
 }
 
-const VacinaDisplay = ({ cpfId, onCountChange }: VacinaDisplayProps) => {
+const VacinaDisplay = ({ cpfId, onCountChange, onEdit }: VacinaDisplayProps) => {
   const [vacinas, setVacinas] = useState<BaseVacina[]>([]);
   const [loading, setLoading] = useState(true);
   const { getVacinasByCpfId } = useBaseVacina();
