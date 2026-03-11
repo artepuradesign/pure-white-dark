@@ -15,7 +15,7 @@ interface AuxilioEmergencialSectionProps {
   onAddRecord?: () => void;
 }
 
-export const AuxilioEmergencialSection = ({ auxilios, onEdit, onEditRecord }: AuxilioEmergencialSectionProps) => {
+export const AuxilioEmergencialSection = ({ auxilios, onEdit, onEditRecord, onAddRecord }: AuxilioEmergencialSectionProps) => {
   const hasData = useMemo(() => (auxilios?.length ?? 0) > 0, [auxilios?.length]);
   const sectionCardClass = useMemo(
     () => (hasData ? 'border-success-border bg-success-subtle' : undefined),
