@@ -4179,6 +4179,13 @@ Todos os direitos reservados.`;
           {showEnderecosSection && (
             <div id="enderecos-section" className={enderecosCount === 0 ? 'hidden' : ''}>
               
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('enderecos')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
               <EnderecosSection key={`enderecos-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEnderecosCount} />
             </div>
           )}
