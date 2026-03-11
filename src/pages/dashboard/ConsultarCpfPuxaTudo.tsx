@@ -4560,7 +4560,8 @@ Todos os direitos reservados.`;
                 key={`vacinas-${sectionsRefreshKey}`}
                 cpfId={result.id}
                 onCountChange={setVacinasCount}
-                onEdit={isSupportOrAdmin ? () => openEditModal('vacinas') : undefined}
+                onAddRecord={isSupportOrAdmin ? () => openAddSectionModal('vacinas') : undefined}
+                onEditRecord={isSupportOrAdmin ? (record) => openEditModal('vacinas', record) : undefined}
               />
             </div>
           )}
