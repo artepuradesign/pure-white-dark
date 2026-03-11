@@ -151,6 +151,18 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit, onEditRecord, onAd
               </Button>
             )}
 
+            {onAddRecord && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onAddRecord}
+                className="h-8 w-8"
+                title="Adicionar novo registro"
+              >
+                <Plus className="h-4 w-4" />
+              </Button>
+            )}
+
             {hasData && (
               <Button
                 variant="ghost"
