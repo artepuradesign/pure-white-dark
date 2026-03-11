@@ -93,6 +93,18 @@ const ParentesSection: React.FC<ParentesSectionProps> = ({ cpfId, onCountChange,
           </CardTitle>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEdit}
+                className="h-8 w-8"
+                title="Editar dados da seção"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+
             {parentes.length > 0 && (
               <Button
                 variant="ghost"
