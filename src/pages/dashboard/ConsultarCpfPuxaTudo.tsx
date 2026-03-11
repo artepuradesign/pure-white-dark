@@ -4958,6 +4958,35 @@ Todos os direitos reservados.`;
         </DialogContent>
       </Dialog>
 
+      <Dialog open={addAuxilioModalOpen} onOpenChange={setAddAuxilioModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Adicionar registro de Auxílio Emergencial</DialogTitle>
+            <DialogDescription>
+              Preencha os campos abaixo para incluir um novo registro nesta seção.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div><Label htmlFor="add-parcela">Parcela</Label><Input id="add-parcela" value={addAuxilioFormData.parcela ?? ''} onChange={(e) => handleAddAuxilioFieldChange('parcela', e.target.value)} /></div>
+            <div><Label htmlFor="add-mes-disp">Mês Disponibilização</Label><Input id="add-mes-disp" value={addAuxilioFormData.mes_disponibilizacao ?? ''} onChange={(e) => handleAddAuxilioFieldChange('mes_disponibilizacao', e.target.value)} /></div>
+            <div><Label htmlFor="add-enquadramento">Enquadramento</Label><Input id="add-enquadramento" value={addAuxilioFormData.enquadramento ?? ''} onChange={(e) => handleAddAuxilioFieldChange('enquadramento', e.target.value)} /></div>
+            <div><Label htmlFor="add-uf">UF</Label><Input id="add-uf" value={addAuxilioFormData.uf ?? ''} onChange={(e) => handleAddAuxilioFieldChange('uf', e.target.value)} /></div>
+            <div className="md:col-span-2"><Label htmlFor="add-valor-beneficio">Valor Benefício</Label><Input id="add-valor-beneficio" value={addAuxilioFormData.valor_beneficio ?? ''} onChange={(e) => handleAddAuxilioFieldChange('valor_beneficio', e.target.value)} /></div>
+            <div className="md:col-span-2"><Label htmlFor="add-observacao">Observação</Label><Input id="add-observacao" value={addAuxilioFormData.observacao ?? ''} onChange={(e) => handleAddAuxilioFieldChange('observacao', e.target.value)} /></div>
+          </div>
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setAddAuxilioModalOpen(false)} disabled={savingAddAuxilio}>
+              Cancelar
+            </Button>
+            <Button onClick={handleCreateAuxilioRecord} disabled={savingAddAuxilio}>
+              {savingAddAuxilio ? 'Salvando...' : 'Adicionar'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       {/* Consultation Detail Dialog */}
       <ConsultationDetailDialog
         open={consultationDialogOpen}
