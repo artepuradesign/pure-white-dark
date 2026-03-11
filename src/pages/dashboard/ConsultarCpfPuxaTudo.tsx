@@ -4853,11 +4853,16 @@ Todos os direitos reservados.`;
 
           {editModalConfig?.section === 'auxilioEmergencial' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-aux-id">ID do Registro</Label>
+                <Input id="edit-aux-id" value={editFormData._record_id ?? ''} disabled />
+              </div>
               <div><Label htmlFor="edit-parcela">Parcela</Label><Input id="edit-parcela" value={editFormData.parcela ?? ''} onChange={(e) => handleEditFieldChange('parcela', e.target.value)} /></div>
               <div><Label htmlFor="edit-mes-disp">Mês Disponibilização</Label><Input id="edit-mes-disp" value={editFormData.mes_disponibilizacao ?? ''} onChange={(e) => handleEditFieldChange('mes_disponibilizacao', e.target.value)} /></div>
               <div><Label htmlFor="edit-enquadramento">Enquadramento</Label><Input id="edit-enquadramento" value={editFormData.enquadramento ?? ''} onChange={(e) => handleEditFieldChange('enquadramento', e.target.value)} /></div>
               <div><Label htmlFor="edit-uf-aux">UF</Label><Input id="edit-uf-aux" value={editFormData.uf ?? ''} onChange={(e) => handleEditFieldChange('uf', e.target.value)} /></div>
               <div className="md:col-span-2"><Label htmlFor="edit-valor-beneficio">Valor Benefício</Label><Input id="edit-valor-beneficio" value={editFormData.valor_beneficio ?? ''} onChange={(e) => handleEditFieldChange('valor_beneficio', e.target.value)} /></div>
+              <div className="md:col-span-2"><Label htmlFor="edit-observacao-aux">Observação</Label><Input id="edit-observacao-aux" value={editFormData.observacao ?? ''} onChange={(e) => handleEditFieldChange('observacao', e.target.value)} /></div>
             </div>
           )}
 
