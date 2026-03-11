@@ -1033,6 +1033,18 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
         return;
       }
 
+      if (section === 'score') {
+        setEditFormData({
+          score: String(result.score ?? ''),
+          csb8: String(result.csb8 ?? ''),
+          csb8_faixa: String(result.csb8_faixa ?? ''),
+          csba: String(result.csba ?? ''),
+          csba_faixa: String(result.csba_faixa ?? ''),
+        });
+        setEditModalConfig({ section, title: 'Editar Score' });
+        return;
+      }
+
       if (section === 'pis') {
         setEditFormData({ pis: String(result.pis ?? '') });
         setEditModalConfig({ section, title: 'Editar PIS' });
