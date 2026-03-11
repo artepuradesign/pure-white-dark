@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { HandCoins, Copy, Pencil } from 'lucide-react';
+import { HandCoins, Copy, Pencil, Plus } from 'lucide-react';
 import { BaseAuxilioEmergencial } from '@/services/baseAuxilioEmergencialService';
 import { toast } from 'sonner';
 
@@ -12,9 +12,10 @@ interface AuxilioEmergencialSectionProps {
   auxilios: BaseAuxilioEmergencial[];
   onEdit?: () => void;
   onEditRecord?: (record: BaseAuxilioEmergencial) => void;
+  onAddRecord?: () => void;
 }
 
-export const AuxilioEmergencialSection = ({ auxilios, onEdit, onEditRecord }: AuxilioEmergencialSectionProps) => {
+export const AuxilioEmergencialSection = ({ auxilios, onEdit, onEditRecord, onAddRecord }: AuxilioEmergencialSectionProps) => {
   const hasData = useMemo(() => (auxilios?.length ?? 0) > 0, [auxilios?.length]);
   const sectionCardClass = useMemo(
     () => (hasData ? 'border-success-border bg-success-subtle' : undefined),
@@ -147,6 +148,18 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit, onEditRecord }: Au
                 title="Editar dados da seção"
               >
                 <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+
+            {onAddRecord && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onAddRecord}
+                className="h-8 w-8"
+                title="Adicionar novo registro"
+              >
+                <Plus className="h-4 w-4" />
               </Button>
             )}
 
