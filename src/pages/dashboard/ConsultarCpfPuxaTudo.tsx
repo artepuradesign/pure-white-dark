@@ -4469,10 +4469,12 @@ Todos os direitos reservados.`;
           )}
 
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setEditModalConfig(null)}>
+            <Button variant="outline" onClick={() => setEditModalConfig(null)} disabled={savingEdit}>
               Cancelar
             </Button>
-            <Button onClick={handleSaveEditedSection}>Salvar</Button>
+            <Button onClick={handleSaveEditedSection} disabled={savingEdit}>
+              {savingEdit ? 'Salvando...' : 'Salvar'}
+            </Button>
           </div>
         </DialogContent>
       </Dialog>
