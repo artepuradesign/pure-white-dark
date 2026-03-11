@@ -1006,10 +1006,13 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
       let payload: Record<string, any> = {};
 
       if (editModalConfig.section === 'dadosFinanceiros') {
+        const normalizedCpf = String(result.cpf ?? '').replace(/\D/g, '').trim();
+
         payload = {
-          poder_aquisitivo: editFormData.poder_aquisitivo ?? '',
-          renda: editFormData.renda ?? '',
-          fx_poder_aquisitivo: editFormData.fx_poder_aquisitivo ?? '',
+          ...(normalizedCpf ? { cpf: normalizedCpf } : {}),
+          poder_aquisitivo: (editFormData.poder_aquisitivo ?? '').toUpperCase().trim(),
+          renda: (editFormData.renda ?? '').toUpperCase().trim(),
+          fx_poder_aquisitivo: (editFormData.fx_poder_aquisitivo ?? '').toUpperCase().trim(),
         };
       } else if (editModalConfig.section === 'dadosBasicos') {
         const normalizedCpf = (editFormData.cpf ?? '').replace(/\D/g, '').trim();
