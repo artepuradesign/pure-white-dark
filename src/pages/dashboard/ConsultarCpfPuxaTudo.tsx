@@ -949,7 +949,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
   };
 
 
-  const openEditModal = async (section: EditableSection) => {
+  const openEditModal = async (section: EditableSection, selectedRecord?: BaseAuxilioEmergencial) => {
     if (!result?.id) return;
 
     try {
