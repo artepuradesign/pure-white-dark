@@ -4354,7 +4354,7 @@ Todos os direitos reservados.`;
               </div>
 
               <div id="vivo-section" className={vivoCount === 0 ? 'hidden' : ''}>
-                {renderAdminSectionHeader('Operadora Vivo', vivoCount, () => openEditModal('operadoraVivo'))}
+                
                 <VivoSection key={`vivo-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVivoCount} />
               </div>
 
