@@ -85,6 +85,13 @@ import PisSection from '@/components/dashboard/PisSection';
 import ScrollToTop from '@/components/ui/scroll-to-top';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import { smoothScrollToHash } from '@/utils/smoothScroll';
+import { baseTelefoneService } from '@/services/baseTelefoneService';
+import { baseEmailService } from '@/services/baseEmailService';
+import { baseEnderecoService } from '@/services/baseEnderecoService';
+import { baseParenteService } from '@/services/baseParenteService';
+import { baseCnsService } from '@/services/baseCnsService';
+import { baseVacinaService } from '@/services/baseVacinaService';
+import { baseVivoService } from '@/services/baseVivoService';
 
 // Função melhorada para consultar CPF e registrar com debug robusto
 const consultarCPFComRegistro = async (
