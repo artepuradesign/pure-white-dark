@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Progress } from '@/components/ui/progress';
 import { 
   User, Search, AlertCircle, CheckCircle, Download, Settings, Crown, FileText, 
-  Camera, DollarSign, TrendingUp, Award, Shield, Target, AlertTriangle, Info, Copy, Phone, ShoppingCart, Wallet
+  Camera, DollarSign, TrendingUp, Award, Shield, Target, AlertTriangle, Info, Copy, Phone, ShoppingCart, Wallet, Pencil
 } from 'lucide-react';
 import PixQRCodeModal from '@/components/payment/PixQRCodeModal';
 import { usePixPaymentFlow } from '@/hooks/usePixPaymentFlow';
