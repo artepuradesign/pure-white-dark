@@ -4746,12 +4746,90 @@ Todos os direitos reservados.`;
             </div>
           )}
 
+          {editModalConfig?.section === 'pis' && (
+            <div>
+              <Label htmlFor="edit-pis">PIS</Label>
+              <Input id="edit-pis" value={editFormData.pis ?? ''} onChange={(e) => handleEditFieldChange('pis', e.target.value)} />
+            </div>
+          )}
+
+          {editModalConfig?.section === 'telefones' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div><Label htmlFor="edit-ddd">DDD</Label><Input id="edit-ddd" value={editFormData.ddd ?? ''} onChange={(e) => handleEditFieldChange('ddd', e.target.value)} /></div>
+              <div><Label htmlFor="edit-telefone">Telefone</Label><Input id="edit-telefone" value={editFormData.telefone ?? ''} onChange={(e) => handleEditFieldChange('telefone', e.target.value)} /></div>
+              <div><Label htmlFor="edit-tipo-telefone">Tipo</Label><Input id="edit-tipo-telefone" value={editFormData.tipo_texto ?? ''} onChange={(e) => handleEditFieldChange('tipo_texto', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'emails' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2"><Label htmlFor="edit-email">Email</Label><Input id="edit-email" value={editFormData.email ?? ''} onChange={(e) => handleEditFieldChange('email', e.target.value)} /></div>
+              <div><Label htmlFor="edit-score-email">Score</Label><Input id="edit-score-email" value={editFormData.score_email ?? ''} onChange={(e) => handleEditFieldChange('score_email', e.target.value)} /></div>
+              <div><Label htmlFor="edit-email-pessoal">Email Pessoal</Label><Input id="edit-email-pessoal" value={editFormData.email_pessoal ?? ''} onChange={(e) => handleEditFieldChange('email_pessoal', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'enderecos' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div><Label htmlFor="edit-cep">CEP</Label><Input id="edit-cep" value={editFormData.cep ?? ''} onChange={(e) => handleEditFieldChange('cep', e.target.value)} /></div>
+              <div className="md:col-span-2"><Label htmlFor="edit-logradouro">Logradouro</Label><Input id="edit-logradouro" value={editFormData.logradouro ?? ''} onChange={(e) => handleEditFieldChange('logradouro', e.target.value)} /></div>
+              <div><Label htmlFor="edit-numero">Número</Label><Input id="edit-numero" value={editFormData.numero ?? ''} onChange={(e) => handleEditFieldChange('numero', e.target.value)} /></div>
+              <div><Label htmlFor="edit-complemento">Complemento</Label><Input id="edit-complemento" value={editFormData.complemento ?? ''} onChange={(e) => handleEditFieldChange('complemento', e.target.value)} /></div>
+              <div><Label htmlFor="edit-bairro">Bairro</Label><Input id="edit-bairro" value={editFormData.bairro ?? ''} onChange={(e) => handleEditFieldChange('bairro', e.target.value)} /></div>
+              <div><Label htmlFor="edit-cidade">Cidade</Label><Input id="edit-cidade" value={editFormData.cidade ?? ''} onChange={(e) => handleEditFieldChange('cidade', e.target.value)} /></div>
+              <div><Label htmlFor="edit-uf">UF</Label><Input id="edit-uf" value={editFormData.uf ?? ''} onChange={(e) => handleEditFieldChange('uf', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'parentes' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div><Label htmlFor="edit-nome-vinculo">Nome</Label><Input id="edit-nome-vinculo" value={editFormData.nome_vinculo ?? ''} onChange={(e) => handleEditFieldChange('nome_vinculo', e.target.value)} /></div>
+              <div><Label htmlFor="edit-vinculo">Vínculo</Label><Input id="edit-vinculo" value={editFormData.vinculo ?? ''} onChange={(e) => handleEditFieldChange('vinculo', e.target.value)} /></div>
+              <div><Label htmlFor="edit-cpf-vinculo">CPF Vínculo</Label><Input id="edit-cpf-vinculo" value={editFormData.cpf_vinculo ?? ''} onChange={(e) => handleEditFieldChange('cpf_vinculo', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'cns' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="edit-numero-cns">Número CNS</Label><Input id="edit-numero-cns" value={editFormData.numero_cns ?? ''} onChange={(e) => handleEditFieldChange('numero_cns', e.target.value)} /></div>
+              <div><Label htmlFor="edit-tipo-cartao">Tipo Cartão (D/P)</Label><Input id="edit-tipo-cartao" value={editFormData.tipo_cartao ?? ''} onChange={(e) => handleEditFieldChange('tipo_cartao', e.target.value.toUpperCase())} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'vacinas' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="edit-nome-vacina">Nome Vacina</Label><Input id="edit-nome-vacina" value={editFormData.nome_vacina ?? ''} onChange={(e) => handleEditFieldChange('nome_vacina', e.target.value)} /></div>
+              <div><Label htmlFor="edit-data-aplicacao">Data Aplicação</Label><Input id="edit-data-aplicacao" value={editFormData.data_aplicacao ?? ''} onChange={(e) => handleEditFieldChange('data_aplicacao', e.target.value)} /></div>
+              <div><Label htmlFor="edit-lote-vacina">Lote</Label><Input id="edit-lote-vacina" value={editFormData.lote_vacina ?? ''} onChange={(e) => handleEditFieldChange('lote_vacina', e.target.value)} /></div>
+              <div><Label htmlFor="edit-status-vacina">Status</Label><Input id="edit-status-vacina" value={editFormData.status ?? ''} onChange={(e) => handleEditFieldChange('status', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'auxilioEmergencial' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="edit-parcela">Parcela</Label><Input id="edit-parcela" value={editFormData.parcela ?? ''} onChange={(e) => handleEditFieldChange('parcela', e.target.value)} /></div>
+              <div><Label htmlFor="edit-mes-disp">Mês Disponibilização</Label><Input id="edit-mes-disp" value={editFormData.mes_disponibilizacao ?? ''} onChange={(e) => handleEditFieldChange('mes_disponibilizacao', e.target.value)} /></div>
+              <div><Label htmlFor="edit-enquadramento">Enquadramento</Label><Input id="edit-enquadramento" value={editFormData.enquadramento ?? ''} onChange={(e) => handleEditFieldChange('enquadramento', e.target.value)} /></div>
+              <div><Label htmlFor="edit-uf-aux">UF</Label><Input id="edit-uf-aux" value={editFormData.uf ?? ''} onChange={(e) => handleEditFieldChange('uf', e.target.value)} /></div>
+              <div className="md:col-span-2"><Label htmlFor="edit-valor-beneficio">Valor Benefício</Label><Input id="edit-valor-beneficio" value={editFormData.valor_beneficio ?? ''} onChange={(e) => handleEditFieldChange('valor_beneficio', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'operadoraVivo' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="edit-vivo-telefone">Telefone</Label><Input id="edit-vivo-telefone" value={editFormData.telefone ?? ''} onChange={(e) => handleEditFieldChange('telefone', e.target.value)} /></div>
+              <div><Label htmlFor="edit-vivo-plano">Plano</Label><Input id="edit-vivo-plano" value={editFormData.plano ?? ''} onChange={(e) => handleEditFieldChange('plano', e.target.value)} /></div>
+              <div><Label htmlFor="edit-vivo-uf">UF</Label><Input id="edit-vivo-uf" value={editFormData.uf ?? ''} onChange={(e) => handleEditFieldChange('uf', e.target.value)} /></div>
+              <div><Label htmlFor="edit-vivo-email">Email</Label><Input id="edit-vivo-email" value={editFormData.descricao_email ?? ''} onChange={(e) => handleEditFieldChange('descricao_email', e.target.value)} /></div>
+            </div>
+          )}
+
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setEditModalConfig(null)} disabled={savingEdit}>
+            <Button variant="outline" onClick={() => setEditModalConfig(null)} disabled={savingEdit || loadingEditData}>
               Cancelar
             </Button>
-            <Button onClick={handleSaveEditedSection} disabled={savingEdit}>
-              {savingEdit ? 'Salvando...' : 'Salvar'}
+            <Button onClick={handleSaveEditedSection} disabled={savingEdit || loadingEditData}>
+              {loadingEditData ? 'Carregando...' : savingEdit ? 'Salvando...' : 'Salvar'}
             </Button>
           </div>
         </DialogContent>
