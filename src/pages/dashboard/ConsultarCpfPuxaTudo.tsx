@@ -1148,7 +1148,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           renda: editFormData.renda ?? '',
           titulo_eleitor: editFormData.titulo_eleitor ?? '',
         };
-      } else {
+      } else if (editModalConfig.section === 'tituloEleitor') {
         payload = {
           titulo_eleitor: editFormData.titulo_eleitor ?? '',
           zona: editFormData.zona ?? '',
