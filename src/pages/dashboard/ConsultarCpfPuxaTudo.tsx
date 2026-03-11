@@ -4282,7 +4282,7 @@ Todos os direitos reservados.`;
           {/* CNS */}
           {(!isSlimMode || isExclusiveMode) && showCnsSection && (
             <div id="cns-section" className={cnsCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('CNS', cnsCount, () => openEditModal('cns'))}
+              
               <CnsSection key={`cns-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setCnsCount} />
             </div>
           )}
