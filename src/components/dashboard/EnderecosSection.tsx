@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Copy } from 'lucide-react';
+import { MapPin, Copy, Pencil } from 'lucide-react';
 import { useBaseEndereco, BaseEndereco } from '@/hooks/useBaseEndereco';
 import { toast } from "sonner";
 
