@@ -1067,7 +1067,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
         return;
       }
 
-      const loaders: Record<Exclude<EditableSection, 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'pis' | 'auxilioEmergencial'>, () => Promise<any[]>> = {
+      const loaders: Record<Exclude<EditableSection, 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'score' | 'pis' | 'auxilioEmergencial'>, () => Promise<any[]>> = {
         telefones: async () => (await baseTelefoneService.getByCpfId(result.id)).data || [],
         emails: async () => (await baseEmailService.getByCpfId(result.id)).data || [],
         enderecos: async () => (await baseEnderecoService.getByCpfId(result.id)).data || [],
