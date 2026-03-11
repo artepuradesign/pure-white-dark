@@ -3695,6 +3695,17 @@ Todos os direitos reservados.`;
                       embedded
                       headerRight={
                         <div className="flex items-center gap-2">
+                          {isSupportOrAdmin && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => openEditModal('score')}
+                              className="h-7 w-7"
+                              title="Editar dados da seção"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="icon"
@@ -3702,6 +3713,10 @@ Todos os direitos reservados.`;
                               const dados = [
                                 `SCORE: ${result.score || '-'}`,
                                 `FAIXA: ${scoreData.label || '-'}`,
+                                `CSB8: ${result.csb8 || '-'}`,
+                                `CSB8 FAIXA: ${result.csb8_faixa || '-'}`,
+                                `CSBA: ${result.csba || '-'}`,
+                                `CSBA FAIXA: ${result.csba_faixa || '-'}`,
                               ].join('\n');
                               navigator.clipboard.writeText(dados);
                               toast.success('Score copiado!');
