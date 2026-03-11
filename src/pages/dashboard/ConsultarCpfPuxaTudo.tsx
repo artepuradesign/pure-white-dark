@@ -603,6 +603,7 @@ interface CPFResult {
 }
 
 type EditableSection = 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'score' | 'telefones' | 'emails' | 'enderecos' | 'parentes' | 'cns' | 'pis' | 'vacinas' | 'auxilioEmergencial' | 'operadoraVivo';
+type AddableSection = 'telefones' | 'emails' | 'enderecos' | 'parentes' | 'cns' | 'vacinas';
 
 interface EditModalConfig {
   section: EditableSection;
