@@ -4290,7 +4290,7 @@ Todos os direitos reservados.`;
           {/* PIS */}
           {(!isSlimMode || isExclusiveMode) && showPisSection && pisCount > 0 && (
             <div id="pis-section">
-              {renderAdminSectionHeader('PIS', pisCount, () => openEditModal('pis'))}
+              
               <PisSection pis={result.pis} />
             </div>
           )}
