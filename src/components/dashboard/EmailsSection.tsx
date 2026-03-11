@@ -15,9 +15,10 @@ interface EmailsSectionProps {
   onCountChange?: (count: number) => void;
   /** Modo compacto para telas específicas (ex.: CPF Simples) */
   compact?: boolean;
+  onEdit?: () => void;
 }
 
-const EmailsSection: React.FC<EmailsSectionProps> = ({ cpfId, onCountChange, compact = false }) => {
+const EmailsSection: React.FC<EmailsSectionProps> = ({ cpfId, onCountChange, compact = false, onEdit }) => {
   const { isLoading, getEmailsByCpfId } = useBaseEmail();
   const [emails, setEmails] = useState<BaseEmail[]>([]);
   const [didLoad, setDidLoad] = useState(false);
