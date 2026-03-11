@@ -937,6 +937,101 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
     };
   };
 
+  const openEditModal = (section: EditableSection) => {
+    if (!result) return;
+
+    if (section === 'dadosFinanceiros') {
+      setEditFormData({
+        poder_aquisitivo: String(result.poder_aquisitivo ?? ''),
+        renda: String(result.renda ?? ''),
+        fx_poder_aquisitivo: String(result.fx_poder_aquisitivo ?? ''),
+      });
+      setEditModalConfig({ section, title: 'Editar Dados Financeiros' });
+      return;
+    }
+
+    if (section === 'dadosBasicos') {
+      setEditFormData({
+        cpf: String(result.cpf ?? ''),
+        nome: String(result.nome ?? ''),
+        data_nascimento: String(result.data_nascimento ?? ''),
+        sexo: String(result.sexo ?? ''),
+        mae: String((result.mae || result.nome_mae) ?? ''),
+        pai: String((result.pai || result.nome_pai) ?? ''),
+        estado_civil: String(result.estado_civil ?? ''),
+        rg: String(result.rg ?? ''),
+        cbo: String(result.cbo ?? ''),
+        orgao_emissor: String(result.orgao_emissor ?? ''),
+        uf_emissao: String(result.uf_emissao ?? ''),
+        data_obito: String(result.data_obito ?? ''),
+        renda: String(result.renda ?? ''),
+        titulo_eleitor: String(result.titulo_eleitor ?? ''),
+      });
+      setEditModalConfig({ section, title: 'Editar Dados Básicos' });
+      return;
+    }
+
+    setEditFormData({
+      titulo_eleitor: String(result.titulo_eleitor ?? ''),
+      zona: String(result.zona ?? ''),
+      secao: String(result.secao ?? ''),
+    });
+    setEditModalConfig({ section, title: 'Editar Título de Eleitor' });
+  };
+
+  const handleEditFieldChange = (field: string, value: string) => {
+    setEditFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveEditedSection = () => {
+    if (!editModalConfig) return;
+
+    setResult((prev) => {
+      if (!prev) return prev;
+
+      if (editModalConfig.section === 'dadosFinanceiros') {
+        return {
+          ...prev,
+          poder_aquisitivo: editFormData.poder_aquisitivo ?? '',
+          renda: editFormData.renda ?? '',
+          fx_poder_aquisitivo: editFormData.fx_poder_aquisitivo ?? '',
+        };
+      }
+
+      if (editModalConfig.section === 'dadosBasicos') {
+        return {
+          ...prev,
+          cpf: editFormData.cpf ?? '',
+          nome: editFormData.nome ?? '',
+          data_nascimento: editFormData.data_nascimento ?? '',
+          sexo: editFormData.sexo ?? '',
+          mae: editFormData.mae ?? '',
+          nome_mae: editFormData.mae ?? '',
+          pai: editFormData.pai ?? '',
+          nome_pai: editFormData.pai ?? '',
+          estado_civil: editFormData.estado_civil ?? '',
+          rg: editFormData.rg ?? '',
+          cbo: editFormData.cbo ?? '',
+          orgao_emissor: editFormData.orgao_emissor ?? '',
+          uf_emissao: editFormData.uf_emissao ?? '',
+          data_obito: editFormData.data_obito ?? '',
+          renda: editFormData.renda ?? '',
+          titulo_eleitor: editFormData.titulo_eleitor ?? '',
+        };
+      }
+
+      return {
+        ...prev,
+        titulo_eleitor: editFormData.titulo_eleitor ?? '',
+        zona: editFormData.zona ?? '',
+        secao: editFormData.secao ?? '',
+      };
+    });
+
+    toast.success('Dados atualizados na tela!');
+    setEditModalConfig(null);
+  };
+
   // Carregar últimas 5 consultas CPF para exibir na seção de histórico
   const loadRecentConsultations = async () => {
     if (!user) return;
