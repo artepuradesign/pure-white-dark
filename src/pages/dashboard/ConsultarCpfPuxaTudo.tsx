@@ -5115,6 +5115,102 @@ Todos os direitos reservados.`;
         </DialogContent>
       </Dialog>
 
+      <Dialog open={!!addSectionModalConfig} onOpenChange={(open) => !open && setAddSectionModalConfig(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{addSectionModalConfig?.title || 'Adicionar registro'}</DialogTitle>
+            <DialogDescription>
+              Preencha os campos abaixo para incluir um novo registro nesta seção.
+            </DialogDescription>
+          </DialogHeader>
+
+          {addSectionModalConfig?.section === 'telefones' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="add-telefone-ddd">DDD</Label><Input id="add-telefone-ddd" value={addSectionFormData.ddd ?? ''} onChange={(e) => handleAddSectionFieldChange('ddd', e.target.value)} /></div>
+              <div><Label htmlFor="add-telefone-numero">Telefone</Label><Input id="add-telefone-numero" value={addSectionFormData.telefone ?? ''} onChange={(e) => handleAddSectionFieldChange('telefone', e.target.value)} /></div>
+              <div><Label htmlFor="add-telefone-tipo">Tipo</Label><Input id="add-telefone-tipo" value={addSectionFormData.tipo_texto ?? ''} onChange={(e) => handleAddSectionFieldChange('tipo_texto', e.target.value)} /></div>
+              <div><Label htmlFor="add-telefone-class">Classificação</Label><Input id="add-telefone-class" value={addSectionFormData.classificacao ?? ''} onChange={(e) => handleAddSectionFieldChange('classificacao', e.target.value)} /></div>
+              <div><Label htmlFor="add-telefone-sigilo">Sigilo (0/1)</Label><Input id="add-telefone-sigilo" value={addSectionFormData.sigilo ?? ''} onChange={(e) => handleAddSectionFieldChange('sigilo', e.target.value)} /></div>
+              <div><Label htmlFor="add-telefone-data">Data Inclusão</Label><Input id="add-telefone-data" value={addSectionFormData.data_inclusao ?? ''} onChange={(e) => handleAddSectionFieldChange('data_inclusao', e.target.value)} placeholder="YYYY-MM-DD" /></div>
+            </div>
+          )}
+
+          {addSectionModalConfig?.section === 'emails' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2"><Label htmlFor="add-email">Email</Label><Input id="add-email" value={addSectionFormData.email ?? ''} onChange={(e) => handleAddSectionFieldChange('email', e.target.value)} /></div>
+              <div><Label htmlFor="add-score-email">Score</Label><Input id="add-score-email" value={addSectionFormData.score_email ?? ''} onChange={(e) => handleAddSectionFieldChange('score_email', e.target.value)} /></div>
+              <div><Label htmlFor="add-email-pessoal">Email Pessoal (S/N)</Label><Input id="add-email-pessoal" value={addSectionFormData.email_pessoal ?? ''} onChange={(e) => handleAddSectionFieldChange('email_pessoal', e.target.value)} /></div>
+              <div><Label htmlFor="add-email-prioridade">Prioridade</Label><Input id="add-email-prioridade" value={addSectionFormData.prioridade ?? ''} onChange={(e) => handleAddSectionFieldChange('prioridade', e.target.value)} /></div>
+              <div><Label htmlFor="add-email-duplicado">Duplicado (S/N)</Label><Input id="add-email-duplicado" value={addSectionFormData.email_duplicado ?? ''} onChange={(e) => handleAddSectionFieldChange('email_duplicado', e.target.value)} /></div>
+              <div><Label htmlFor="add-email-blacklist">Blacklist (S/N)</Label><Input id="add-email-blacklist" value={addSectionFormData.blacklist ?? ''} onChange={(e) => handleAddSectionFieldChange('blacklist', e.target.value)} /></div>
+              <div><Label htmlFor="add-email-estrutura">Estrutura</Label><Input id="add-email-estrutura" value={addSectionFormData.estrutura ?? ''} onChange={(e) => handleAddSectionFieldChange('estrutura', e.target.value)} /></div>
+              <div><Label htmlFor="add-email-statusvt">Status VT</Label><Input id="add-email-statusvt" value={addSectionFormData.status_vt ?? ''} onChange={(e) => handleAddSectionFieldChange('status_vt', e.target.value)} /></div>
+              <div><Label htmlFor="add-email-dominio">Domínio</Label><Input id="add-email-dominio" value={addSectionFormData.dominio ?? ''} onChange={(e) => handleAddSectionFieldChange('dominio', e.target.value)} /></div>
+              <div><Label htmlFor="add-email-mapas">Mapas</Label><Input id="add-email-mapas" value={addSectionFormData.mapas ?? ''} onChange={(e) => handleAddSectionFieldChange('mapas', e.target.value)} /></div>
+              <div><Label htmlFor="add-email-peso">Peso</Label><Input id="add-email-peso" value={addSectionFormData.peso ?? ''} onChange={(e) => handleAddSectionFieldChange('peso', e.target.value)} /></div>
+              <div><Label htmlFor="add-email-data">Data Inclusão</Label><Input id="add-email-data" value={addSectionFormData.data_inclusao ?? ''} onChange={(e) => handleAddSectionFieldChange('data_inclusao', e.target.value)} placeholder="YYYY-MM-DD" /></div>
+            </div>
+          )}
+
+          {addSectionModalConfig?.section === 'enderecos' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="add-end-cep">CEP</Label><Input id="add-end-cep" value={addSectionFormData.cep ?? ''} onChange={(e) => handleAddSectionFieldChange('cep', e.target.value)} /></div>
+              <div><Label htmlFor="add-end-uf">UF</Label><Input id="add-end-uf" value={addSectionFormData.uf ?? ''} onChange={(e) => handleAddSectionFieldChange('uf', e.target.value)} /></div>
+              <div className="md:col-span-2"><Label htmlFor="add-end-logradouro">Logradouro</Label><Input id="add-end-logradouro" value={addSectionFormData.logradouro ?? ''} onChange={(e) => handleAddSectionFieldChange('logradouro', e.target.value)} /></div>
+              <div><Label htmlFor="add-end-numero">Número</Label><Input id="add-end-numero" value={addSectionFormData.numero ?? ''} onChange={(e) => handleAddSectionFieldChange('numero', e.target.value)} /></div>
+              <div><Label htmlFor="add-end-complemento">Complemento</Label><Input id="add-end-complemento" value={addSectionFormData.complemento ?? ''} onChange={(e) => handleAddSectionFieldChange('complemento', e.target.value)} /></div>
+              <div><Label htmlFor="add-end-bairro">Bairro</Label><Input id="add-end-bairro" value={addSectionFormData.bairro ?? ''} onChange={(e) => handleAddSectionFieldChange('bairro', e.target.value)} /></div>
+              <div><Label htmlFor="add-end-cidade">Cidade</Label><Input id="add-end-cidade" value={addSectionFormData.cidade ?? ''} onChange={(e) => handleAddSectionFieldChange('cidade', e.target.value)} /></div>
+            </div>
+          )}
+
+          {addSectionModalConfig?.section === 'parentes' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="add-parente-nome">Nome</Label><Input id="add-parente-nome" value={addSectionFormData.nome_vinculo ?? ''} onChange={(e) => handleAddSectionFieldChange('nome_vinculo', e.target.value)} /></div>
+              <div><Label htmlFor="add-parente-vinculo">Vínculo</Label><Input id="add-parente-vinculo" value={addSectionFormData.vinculo ?? ''} onChange={(e) => handleAddSectionFieldChange('vinculo', e.target.value)} /></div>
+              <div className="md:col-span-2"><Label htmlFor="add-parente-cpf">CPF</Label><Input id="add-parente-cpf" value={addSectionFormData.cpf_vinculo ?? ''} onChange={(e) => handleAddSectionFieldChange('cpf_vinculo', e.target.value)} /></div>
+            </div>
+          )}
+
+          {addSectionModalConfig?.section === 'cns' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="add-cns-numero">Número CNS</Label><Input id="add-cns-numero" value={addSectionFormData.numero_cns ?? ''} onChange={(e) => handleAddSectionFieldChange('numero_cns', e.target.value)} /></div>
+              <div><Label htmlFor="add-cns-tipo">Tipo Cartão (D/P)</Label><Input id="add-cns-tipo" value={addSectionFormData.tipo_cartao ?? ''} onChange={(e) => handleAddSectionFieldChange('tipo_cartao', e.target.value.toUpperCase())} /></div>
+            </div>
+          )}
+
+          {addSectionModalConfig?.section === 'vacinas' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="md:col-span-2"><Label htmlFor="add-vacina-nome">Nome da Vacina</Label><Input id="add-vacina-nome" value={addSectionFormData.nome_vacina ?? ''} onChange={(e) => handleAddSectionFieldChange('nome_vacina', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-descricao">Descrição</Label><Input id="add-vacina-descricao" value={addSectionFormData.descricao_vacina ?? ''} onChange={(e) => handleAddSectionFieldChange('descricao_vacina', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-lote">Lote</Label><Input id="add-vacina-lote" value={addSectionFormData.lote_vacina ?? ''} onChange={(e) => handleAddSectionFieldChange('lote_vacina', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-grupo">Grupo Atendimento</Label><Input id="add-vacina-grupo" value={addSectionFormData.grupo_atendimento ?? ''} onChange={(e) => handleAddSectionFieldChange('grupo_atendimento', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-data">Data Aplicação</Label><Input id="add-vacina-data" value={addSectionFormData.data_aplicacao ?? ''} onChange={(e) => handleAddSectionFieldChange('data_aplicacao', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-status">Status</Label><Input id="add-vacina-status" value={addSectionFormData.status ?? ''} onChange={(e) => handleAddSectionFieldChange('status', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-estab">Estabelecimento</Label><Input id="add-vacina-estab" value={addSectionFormData.nome_estabelecimento ?? ''} onChange={(e) => handleAddSectionFieldChange('nome_estabelecimento', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-aplicador">Aplicador</Label><Input id="add-vacina-aplicador" value={addSectionFormData.aplicador_vacina ?? ''} onChange={(e) => handleAddSectionFieldChange('aplicador_vacina', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-vaina">Vacina</Label><Input id="add-vacina-vaina" value={addSectionFormData.vaina ?? ''} onChange={(e) => handleAddSectionFieldChange('vaina', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-cor">Cor</Label><Input id="add-vacina-cor" value={addSectionFormData.cor ?? ''} onChange={(e) => handleAddSectionFieldChange('cor', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-cns">CNS</Label><Input id="add-vacina-cns" value={addSectionFormData.cns ?? ''} onChange={(e) => handleAddSectionFieldChange('cns', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-mae">Mãe</Label><Input id="add-vacina-mae" value={addSectionFormData.mae ?? ''} onChange={(e) => handleAddSectionFieldChange('mae', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-uf">UF</Label><Input id="add-vacina-uf" value={addSectionFormData.uf ?? ''} onChange={(e) => handleAddSectionFieldChange('uf', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-municipio">Município</Label><Input id="add-vacina-municipio" value={addSectionFormData.municipio ?? ''} onChange={(e) => handleAddSectionFieldChange('municipio', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-bairro">Bairro</Label><Input id="add-vacina-bairro" value={addSectionFormData.bairro ?? ''} onChange={(e) => handleAddSectionFieldChange('bairro', e.target.value)} /></div>
+              <div><Label htmlFor="add-vacina-cep">CEP</Label><Input id="add-vacina-cep" value={addSectionFormData.cep ?? ''} onChange={(e) => handleAddSectionFieldChange('cep', e.target.value)} /></div>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setAddSectionModalConfig(null)} disabled={savingAddSection}>
+              Cancelar
+            </Button>
+            <Button onClick={handleCreateSectionRecord} disabled={savingAddSection}>
+              {savingAddSection ? 'Salvando...' : 'Adicionar'}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+
       <Dialog open={addAuxilioModalOpen} onOpenChange={setAddAuxilioModalOpen}>
         <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
           <DialogHeader>
