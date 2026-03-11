@@ -4327,7 +4327,7 @@ Todos os direitos reservados.`;
           {/* Auxílio Emergencial */}
           {(!isSlimMode || isExclusiveMode) && showAuxilioEmergencialSection && (auxiliosEmergenciais?.length ?? 0) > 0 && (
             <div id="auxilio-emergencial-section">
-              {renderAdminSectionHeader('Auxílio Emergencial', auxiliosEmergenciais?.length ?? 0, () => openEditModal('auxilioEmergencial'))}
+              
               <AuxilioEmergencialSection auxilios={auxiliosEmergenciais} />
             </div>
           )}
