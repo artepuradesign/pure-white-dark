@@ -4164,7 +4164,7 @@ Todos os direitos reservados.`;
 
           {showEnderecosSection && (
             <div id="enderecos-section" className={enderecosCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('Endereços', enderecosCount, () => openEditModal('enderecos'))}
+              
               <EnderecosSection key={`enderecos-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEnderecosCount} />
             </div>
           )}
