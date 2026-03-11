@@ -602,7 +602,7 @@ interface CPFResult {
   cloud_email?: any[];
 }
 
-type EditableSection = 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'telefones' | 'emails' | 'enderecos' | 'parentes' | 'cns' | 'pis' | 'vacinas' | 'auxilioEmergencial' | 'operadoraVivo';
+type EditableSection = 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'score' | 'telefones' | 'emails' | 'enderecos' | 'parentes' | 'cns' | 'pis' | 'vacinas' | 'auxilioEmergencial' | 'operadoraVivo';
 
 interface EditModalConfig {
   section: EditableSection;
