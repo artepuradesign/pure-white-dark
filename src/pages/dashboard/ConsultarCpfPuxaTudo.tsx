@@ -602,7 +602,7 @@ interface CPFResult {
   cloud_email?: any[];
 }
 
-type EditableSection = 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'telefones' | 'emails' | 'enderecos' | 'parentes' | 'cns' | 'pis' | 'vacinas' | 'auxilioEmergencial' | 'operadoraVivo';
+type EditableSection = 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'score' | 'telefones' | 'emails' | 'enderecos' | 'parentes' | 'cns' | 'pis' | 'vacinas' | 'auxilioEmergencial' | 'operadoraVivo';
 
 interface EditModalConfig {
   section: EditableSection;
@@ -948,6 +948,44 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
     };
   };
 
+  const renderAdminSectionHeader = (
+    title: string,
+    count: number,
+    onEdit: () => void,
+  ) => {
+    if (!isSupportOrAdmin) return null;
+
+    return (
+      <div className="mb-2 flex items-center justify-between gap-2 rounded-md border border-border bg-card p-2">
+        <span className="text-sm font-semibold text-foreground">{title}</span>
+        <div className="flex items-center gap-2">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={onEdit}
+            className="h-8 w-8"
+            title="Editar dados da seção"
+          >
+            <Pencil className="h-4 w-4" />
+          </Button>
+          <div className="relative inline-flex">
+            <Badge variant="secondary" className="uppercase tracking-wide">
+              Online
+            </Badge>
+            {count > 0 ? (
+              <span
+                className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
+                aria-label={`Quantidade de registros ${title}: ${count}`}
+              >
+                {count}
+              </span>
+            ) : null}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   const openEditModal = async (section: EditableSection) => {
     if (!result?.id) return;
 
@@ -995,6 +1033,18 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
         return;
       }
 
+      if (section === 'score') {
+        setEditFormData({
+          score: String(result.score ?? ''),
+          csb8: String(result.csb8 ?? ''),
+          csb8_faixa: String(result.csb8_faixa ?? ''),
+          csba: String(result.csba ?? ''),
+          csba_faixa: String(result.csba_faixa ?? ''),
+        });
+        setEditModalConfig({ section, title: 'Editar Score' });
+        return;
+      }
+
       if (section === 'pis') {
         setEditFormData({ pis: String(result.pis ?? '') });
         setEditModalConfig({ section, title: 'Editar PIS' });
@@ -1017,7 +1067,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
         return;
       }
 
-      const loaders: Record<Exclude<EditableSection, 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'pis' | 'auxilioEmergencial'>, () => Promise<any[]>> = {
+      const loaders: Record<Exclude<EditableSection, 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'score' | 'pis' | 'auxilioEmergencial'>, () => Promise<any[]>> = {
         telefones: async () => (await baseTelefoneService.getByCpfId(result.id)).data || [],
         emails: async () => (await baseEmailService.getByCpfId(result.id)).data || [],
         enderecos: async () => (await baseEnderecoService.getByCpfId(result.id)).data || [],
@@ -1160,8 +1210,18 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
       const section = editModalConfig.section;
       let updateOk = false;
 
-      if (section === 'dadosFinanceiros' || section === 'dadosBasicos' || section === 'tituloEleitor' || section === 'pis') {
-        const cpfPayload = section === 'pis' ? { pis: editFormData.pis ?? '' } : payload;
+      if (section === 'dadosFinanceiros' || section === 'dadosBasicos' || section === 'tituloEleitor' || section === 'score' || section === 'pis') {
+        const cpfPayload = section === 'pis'
+          ? { pis: editFormData.pis ?? '' }
+          : section === 'score'
+            ? {
+                score: Number(editFormData.score || 0),
+                csb8: Number(editFormData.csb8 || 0),
+                csb8_faixa: (editFormData.csb8_faixa ?? '').toUpperCase().trim(),
+                csba: Number(editFormData.csba || 0),
+                csba_faixa: (editFormData.csba_faixa ?? '').toUpperCase().trim(),
+              }
+            : payload;
         const updateResponse = await baseCpfService.update(cpfId, cpfPayload);
         updateOk = !!updateResponse.success;
         if (!updateOk) throw new Error(updateResponse.error || 'Erro ao salvar alterações no banco.');
@@ -1286,6 +1346,17 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           return {
             ...prev,
             pis: editFormData.pis ?? '',
+          };
+        }
+
+        if (section === 'score') {
+          return {
+            ...prev,
+            score: Number(editFormData.score || 0),
+            csb8: Number(editFormData.csb8 || 0),
+            csb8_faixa: (editFormData.csb8_faixa ?? '').toUpperCase().trim(),
+            csba: Number(editFormData.csba || 0),
+            csba_faixa: (editFormData.csba_faixa ?? '').toUpperCase().trim(),
           };
         }
 
@@ -3624,6 +3695,17 @@ Todos os direitos reservados.`;
                       embedded
                       headerRight={
                         <div className="flex items-center gap-2">
+                          {isSupportOrAdmin && (
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => openEditModal('score')}
+                              className="h-7 w-7"
+                              title="Editar dados da seção"
+                            >
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          )}
                           <Button
                             variant="ghost"
                             size="icon"
@@ -3631,6 +3713,10 @@ Todos os direitos reservados.`;
                               const dados = [
                                 `SCORE: ${result.score || '-'}`,
                                 `FAIXA: ${scoreData.label || '-'}`,
+                                `CSB8: ${result.csb8 || '-'}`,
+                                `CSB8 FAIXA: ${result.csb8_faixa || '-'}`,
+                                `CSBA: ${result.csba || '-'}`,
+                                `CSBA FAIXA: ${result.csba_faixa || '-'}`,
                               ].join('\n');
                               navigator.clipboard.writeText(dados);
                               toast.success('Score copiado!');
@@ -4101,39 +4187,21 @@ Todos os direitos reservados.`;
 
           {showTelefonesSection && (
             <div id="telefones-section" className={telefonesCount === 0 ? 'hidden' : ''}>
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('telefones')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              {renderAdminSectionHeader('Telefones', telefonesCount, () => openEditModal('telefones'))}
               <TelefonesSection key={`telefones-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setTelefonesCount} />
             </div>
           )}
 
           {showEmailsSection && (
             <div id="emails-section" className={emailsCount === 0 ? 'hidden' : ''}>
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('emails')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              {renderAdminSectionHeader('Emails', emailsCount, () => openEditModal('emails'))}
               <EmailsSection key={`emails-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEmailsCount} />
             </div>
           )}
 
           {showEnderecosSection && (
             <div id="enderecos-section" className={enderecosCount === 0 ? 'hidden' : ''}>
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('enderecos')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              {renderAdminSectionHeader('Endereços', enderecosCount, () => openEditModal('enderecos'))}
               <EnderecosSection key={`enderecos-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEnderecosCount} />
             </div>
           )}
@@ -4229,13 +4297,7 @@ Todos os direitos reservados.`;
           {/* Parentes */}
           {!isRestrictToBasicAndCertidao && showParentesSection && (
             <div id="parentes-section" className={parentesCount === 0 ? 'hidden' : ''}>
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('parentes')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              {renderAdminSectionHeader('Parentes', parentesCount, () => openEditModal('parentes'))}
               <ParentesSection key={`parentes-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setParentesCount} />
             </div>
           )}
@@ -4257,13 +4319,7 @@ Todos os direitos reservados.`;
           {/* CNS */}
           {(!isSlimMode || isExclusiveMode) && showCnsSection && (
             <div id="cns-section" className={cnsCount === 0 ? 'hidden' : ''}>
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('cns')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              {renderAdminSectionHeader('CNS', cnsCount, () => openEditModal('cns'))}
               <CnsSection key={`cns-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setCnsCount} />
             </div>
           )}
@@ -4271,13 +4327,7 @@ Todos os direitos reservados.`;
           {/* PIS */}
           {(!isSlimMode || isExclusiveMode) && showPisSection && pisCount > 0 && (
             <div id="pis-section">
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('pis')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              {renderAdminSectionHeader('PIS', pisCount, () => openEditModal('pis'))}
               <PisSection pis={result.pis} />
             </div>
           )}
@@ -4285,13 +4335,7 @@ Todos os direitos reservados.`;
           {/* Vacinas */}
           {(!isSlimMode || isExclusiveMode) && showVacinasSection && (
             <div id="vacinas-section" className={vacinasCount === 0 ? 'hidden' : ''}>
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('vacinas')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              {renderAdminSectionHeader('Vacinas', vacinasCount, () => openEditModal('vacinas'))}
               <VacinaDisplay key={`vacinas-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVacinasCount} />
             </div>
           )}
@@ -4320,13 +4364,7 @@ Todos os direitos reservados.`;
           {/* Auxílio Emergencial */}
           {(!isSlimMode || isExclusiveMode) && showAuxilioEmergencialSection && (auxiliosEmergenciais?.length ?? 0) > 0 && (
             <div id="auxilio-emergencial-section">
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('auxilioEmergencial')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              {renderAdminSectionHeader('Auxílio Emergencial', auxiliosEmergenciais?.length ?? 0, () => openEditModal('auxilioEmergencial'))}
               <AuxilioEmergencialSection auxilios={auxiliosEmergenciais} />
             </div>
           )}
@@ -4353,13 +4391,7 @@ Todos os direitos reservados.`;
               </div>
 
               <div id="vivo-section" className={vivoCount === 0 ? 'hidden' : ''}>
-                {isSupportOrAdmin && (
-                  <div className="flex justify-end mb-2">
-                    <Button variant="ghost" size="icon" onClick={() => openEditModal('operadoraVivo')} title="Editar dados da seção">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
+                {renderAdminSectionHeader('Operadora Vivo', vivoCount, () => openEditModal('operadoraVivo'))}
                 <VivoSection key={`vivo-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVivoCount} />
               </div>
 
@@ -4743,6 +4775,16 @@ Todos os direitos reservados.`;
                   onChange={(e) => handleEditFieldChange('secao', e.target.value)}
                 />
               </div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'score' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="edit-score">Score</Label><Input id="edit-score" value={editFormData.score ?? ''} onChange={(e) => handleEditFieldChange('score', e.target.value)} /></div>
+              <div><Label htmlFor="edit-csb8">CSB8</Label><Input id="edit-csb8" value={editFormData.csb8 ?? ''} onChange={(e) => handleEditFieldChange('csb8', e.target.value)} /></div>
+              <div><Label htmlFor="edit-csb8-faixa">Faixa CSB8</Label><Input id="edit-csb8-faixa" value={editFormData.csb8_faixa ?? ''} onChange={(e) => handleEditFieldChange('csb8_faixa', e.target.value)} /></div>
+              <div><Label htmlFor="edit-csba">CSBA</Label><Input id="edit-csba" value={editFormData.csba ?? ''} onChange={(e) => handleEditFieldChange('csba', e.target.value)} /></div>
+              <div className="md:col-span-2"><Label htmlFor="edit-csba-faixa">Faixa CSBA</Label><Input id="edit-csba-faixa" value={editFormData.csba_faixa ?? ''} onChange={(e) => handleEditFieldChange('csba_faixa', e.target.value)} /></div>
             </div>
           )}
 
