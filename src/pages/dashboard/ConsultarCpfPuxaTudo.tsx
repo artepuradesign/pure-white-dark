@@ -959,6 +959,67 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
   };
 
 
+  const openAddAuxilioModal = () => {
+    setAddAuxilioFormData({
+      parcela: '',
+      mes_disponibilizacao: '',
+      enquadramento: '',
+      uf: '',
+      observacao: '',
+      valor_beneficio: '',
+    });
+    setAddAuxilioModalOpen(true);
+  };
+
+  const handleAddAuxilioFieldChange = (field: string, value: string) => {
+    setAddAuxilioFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCreateAuxilioRecord = async () => {
+    if (!result) return;
+
+    setSavingAddAuxilio(true);
+
+    try {
+      let cpfId = result.id;
+
+      if (!cpfId && result.cpf) {
+        const lookup = await baseCpfService.getByCpf(String(result.cpf).replace(/\D/g, ''));
+        if (lookup.success && lookup.data?.id) {
+          cpfId = lookup.data.id;
+        }
+      }
+
+      if (!cpfId) {
+        throw new Error('Não foi possível identificar o CPF para criar o registro.');
+      }
+
+      const createResponse = await baseAuxilioEmergencialService.create({
+        cpf_id: cpfId,
+        parcela: addAuxilioFormData.parcela ?? '',
+        mes_disponibilizacao: addAuxilioFormData.mes_disponibilizacao ?? '',
+        enquadramento: (addAuxilioFormData.enquadramento ?? '').toUpperCase().trim(),
+        uf: (addAuxilioFormData.uf ?? '').toUpperCase().trim(),
+        observacao: (addAuxilioFormData.observacao ?? '').toUpperCase().trim(),
+        valor_beneficio: Number(addAuxilioFormData.valor_beneficio || 0),
+      });
+
+      if (!createResponse.success) {
+        throw new Error(createResponse.error || 'Erro ao adicionar registro de auxílio emergencial.');
+      }
+
+      await getAuxiliosEmergenciaisByCpfId(cpfId);
+      setSectionsRefreshKey((prev) => prev + 1);
+      setAddAuxilioModalOpen(false);
+      toast.success('Registro de auxílio emergencial adicionado com sucesso!');
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erro ao adicionar registro.';
+      toast.error(message);
+    } finally {
+      setSavingAddAuxilio(false);
+    }
+  };
+
   const openEditModal = async (section: EditableSection, selectedRecord?: BaseAuxilioEmergencial) => {
     if (!result?.id) return;
 
