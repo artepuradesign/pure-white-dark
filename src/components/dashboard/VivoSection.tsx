@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Phone, Copy } from 'lucide-react';
+import { Phone, Copy, Pencil } from 'lucide-react';
 import { useBaseVivo } from '@/hooks/useBaseVivo';
 import { toast } from "sonner";
 
