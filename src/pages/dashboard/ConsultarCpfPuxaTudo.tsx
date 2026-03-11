@@ -1349,6 +1349,17 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           };
         }
 
+        if (section === 'score') {
+          return {
+            ...prev,
+            score: Number(editFormData.score || 0),
+            csb8: Number(editFormData.csb8 || 0),
+            csb8_faixa: (editFormData.csb8_faixa ?? '').toUpperCase().trim(),
+            csba: Number(editFormData.csba || 0),
+            csba_faixa: (editFormData.csba_faixa ?? '').toUpperCase().trim(),
+          };
+        }
+
         return prev;
       });
 
