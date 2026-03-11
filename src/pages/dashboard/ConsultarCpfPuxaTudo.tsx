@@ -4151,14 +4151,12 @@ Todos os direitos reservados.`;
           {showTelefonesSection && (
             <div id="telefones-section" className={telefonesCount === 0 ? 'hidden' : ''}>
               
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('telefones')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-              <TelefonesSection key={`telefones-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setTelefonesCount} />
+              <TelefonesSection
+                key={`telefones-${sectionsRefreshKey}`}
+                cpfId={result.id}
+                onCountChange={setTelefonesCount}
+                onEdit={isSupportOrAdmin ? () => openEditModal('telefones') : undefined}
+              />
             </div>
           )}
 
