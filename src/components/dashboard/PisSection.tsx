@@ -17,9 +17,10 @@ const normalizeText = (value: unknown): string => {
 
 interface PisSectionProps {
   pis?: string | null;
+  onEdit?: () => void;
 }
 
-const PisSection: React.FC<PisSectionProps> = ({ pis }) => {
+const PisSection: React.FC<PisSectionProps> = ({ pis, onEdit }) => {
   const pisValue = normalizeText(pis);
   const hasData = useMemo(() => !!pisValue, [pisValue]);
   const sectionCardClass = hasData ? 'border-success-border bg-success-subtle' : '';
