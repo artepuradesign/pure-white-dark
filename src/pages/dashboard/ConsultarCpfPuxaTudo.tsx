@@ -4353,7 +4353,14 @@ Todos os direitos reservados.`;
               </div>
 
               <div id="vivo-section" className={vivoCount === 0 ? 'hidden' : ''}>
-                <VivoSection cpfId={result.id} onCountChange={setVivoCount} />
+                {isSupportOrAdmin && (
+                  <div className="flex justify-end mb-2">
+                    <Button variant="ghost" size="icon" onClick={() => openEditModal('operadoraVivo')} title="Editar dados da seção">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+                <VivoSection key={`vivo-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVivoCount} />
               </div>
 
               <div id="tim-section" className={timCount === 0 ? 'hidden' : ''}>
