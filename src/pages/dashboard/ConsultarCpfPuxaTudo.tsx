@@ -4323,14 +4323,12 @@ Todos os direitos reservados.`;
           {/* Vacinas */}
           {(!isSlimMode || isExclusiveMode) && showVacinasSection && (
             <div id="vacinas-section" className={vacinasCount === 0 ? 'hidden' : ''}>
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('vacinas')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-              <VacinaDisplay key={`vacinas-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVacinasCount} />
+              <VacinaDisplay
+                key={`vacinas-${sectionsRefreshKey}`}
+                cpfId={result.id}
+                onCountChange={setVacinasCount}
+                onEdit={isSupportOrAdmin ? () => openEditModal('vacinas') : undefined}
+              />
             </div>
           )}
 
