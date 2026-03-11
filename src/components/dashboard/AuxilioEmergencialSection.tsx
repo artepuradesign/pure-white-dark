@@ -12,6 +12,7 @@ interface AuxilioEmergencialSectionProps {
   auxilios: BaseAuxilioEmergencial[];
   onEdit?: () => void;
   onEditRecord?: (record: BaseAuxilioEmergencial) => void;
+  onAddRecord?: () => void;
 }
 
 export const AuxilioEmergencialSection = ({ auxilios, onEdit, onEditRecord }: AuxilioEmergencialSectionProps) => {
