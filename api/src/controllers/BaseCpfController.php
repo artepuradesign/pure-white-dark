@@ -225,6 +225,7 @@ class BaseCpfController {
                     if (file_exists($photoPath)) {
                         $this->baseFotoModel->create([
                             'cpf_id' => $cpfId,
+                            'cpf' => $cpfLimpo,
                             'nome' => $photoData['nome'],
                             'photo' => $photoData['photo']
                         ]);
