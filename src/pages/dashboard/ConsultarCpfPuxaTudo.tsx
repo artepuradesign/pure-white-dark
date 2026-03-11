@@ -4537,7 +4537,8 @@ Todos os direitos reservados.`;
                 key={`cns-${sectionsRefreshKey}`}
                 cpfId={result.id}
                 onCountChange={setCnsCount}
-                onEdit={isSupportOrAdmin ? () => openEditModal('cns') : undefined}
+                onAddRecord={isSupportOrAdmin ? () => openAddSectionModal('cns') : undefined}
+                onEditRecord={isSupportOrAdmin ? (record) => openEditModal('cns', record) : undefined}
               />
             </div>
           )}
