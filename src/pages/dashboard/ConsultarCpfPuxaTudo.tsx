@@ -1249,6 +1249,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
             mes_disponibilizacao: editFormData.mes_disponibilizacao ?? '',
             enquadramento: (editFormData.enquadramento ?? '').toUpperCase().trim(),
             uf: (editFormData.uf ?? '').toUpperCase().trim(),
+            observacao: (editFormData.observacao ?? '').toUpperCase().trim(),
             valor_beneficio: Number(editFormData.valor_beneficio || 0),
           });
           updateOk = !!res.success;
