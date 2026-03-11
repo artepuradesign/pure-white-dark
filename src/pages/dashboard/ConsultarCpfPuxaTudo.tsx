@@ -4319,13 +4319,7 @@ Todos os direitos reservados.`;
           {/* CNS */}
           {(!isSlimMode || isExclusiveMode) && showCnsSection && (
             <div id="cns-section" className={cnsCount === 0 ? 'hidden' : ''}>
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('cns')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
+              {renderAdminSectionHeader('CNS', cnsCount, () => openEditModal('cns'))}
               <CnsSection key={`cns-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setCnsCount} />
             </div>
           )}
