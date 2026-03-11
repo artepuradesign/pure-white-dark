@@ -4778,6 +4778,16 @@ Todos os direitos reservados.`;
             </div>
           )}
 
+          {editModalConfig?.section === 'score' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="edit-score">Score</Label><Input id="edit-score" value={editFormData.score ?? ''} onChange={(e) => handleEditFieldChange('score', e.target.value)} /></div>
+              <div><Label htmlFor="edit-csb8">CSB8</Label><Input id="edit-csb8" value={editFormData.csb8 ?? ''} onChange={(e) => handleEditFieldChange('csb8', e.target.value)} /></div>
+              <div><Label htmlFor="edit-csb8-faixa">Faixa CSB8</Label><Input id="edit-csb8-faixa" value={editFormData.csb8_faixa ?? ''} onChange={(e) => handleEditFieldChange('csb8_faixa', e.target.value)} /></div>
+              <div><Label htmlFor="edit-csba">CSBA</Label><Input id="edit-csba" value={editFormData.csba ?? ''} onChange={(e) => handleEditFieldChange('csba', e.target.value)} /></div>
+              <div className="md:col-span-2"><Label htmlFor="edit-csba-faixa">Faixa CSBA</Label><Input id="edit-csba-faixa" value={editFormData.csba_faixa ?? ''} onChange={(e) => handleEditFieldChange('csba_faixa', e.target.value)} /></div>
+            </div>
+          )}
+
           {editModalConfig?.section === 'pis' && (
             <div>
               <Label htmlFor="edit-pis">PIS</Label>
