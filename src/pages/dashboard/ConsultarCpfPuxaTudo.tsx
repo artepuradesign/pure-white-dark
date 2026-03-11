@@ -4260,7 +4260,7 @@ Todos os direitos reservados.`;
           {/* Parentes */}
           {!isRestrictToBasicAndCertidao && showParentesSection && (
             <div id="parentes-section" className={parentesCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('Parentes', parentesCount, () => openEditModal('parentes'))}
+              
               <ParentesSection key={`parentes-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setParentesCount} />
             </div>
           )}
