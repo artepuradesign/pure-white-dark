@@ -13,9 +13,10 @@ import { toast } from "sonner";
 interface ParentesSectionProps {
   cpfId: number;
   onCountChange?: (count: number) => void;
+  onEdit?: () => void;
 }
 
-const ParentesSection: React.FC<ParentesSectionProps> = ({ cpfId, onCountChange }) => {
+const ParentesSection: React.FC<ParentesSectionProps> = ({ cpfId, onCountChange, onEdit }) => {
   const [parentes, setParentes] = useState<BaseParente[]>([]);
   const [loading, setLoading] = useState(true);
   const { getParentesByCpfId } = useBaseParente();
