@@ -3850,6 +3850,17 @@ Todos os direitos reservados.`;
                   Título de Eleitor
                 </CardTitle>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  {isSupportOrAdmin && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openEditModal('tituloEleitor')}
+                      className="h-8 w-8"
+                      title="Editar dados da seção"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
