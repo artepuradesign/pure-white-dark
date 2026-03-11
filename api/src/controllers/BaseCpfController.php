@@ -274,6 +274,18 @@ class BaseCpfController {
                 return;
             }
             
+            // Garantir integridade do CPF no update
+            if (!isset($input['cpf']) || trim((string)$input['cpf']) === '') {
+                // Preserva CPF atual quando não for editado/enviado
+                $input['cpf'] = $existing['cpf'];
+            } else {
+                // Sanitizar CPF quando enviado
+                $input['cpf'] = preg_replace('/\D/', '', (string)$input['cpf']);
+                if ($input['cpf'] === '') {
+                    $input['cpf'] = $existing['cpf'];
+                }
+            }
+
             // Iniciar transação
             $this->db->beginTransaction();
             
