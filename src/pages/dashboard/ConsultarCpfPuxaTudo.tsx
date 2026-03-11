@@ -4435,6 +4435,7 @@ Todos os direitos reservados.`;
             <div id="auxilio-emergencial-section">
               <AuxilioEmergencialSection
                 auxilios={auxiliosEmergenciais}
+                onAddRecord={isSupportOrAdmin ? openAddAuxilioModal : undefined}
                 onEditRecord={isSupportOrAdmin ? (record) => openEditModal('auxilioEmergencial', record) : undefined}
               />
             </div>
