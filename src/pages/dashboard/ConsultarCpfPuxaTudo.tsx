@@ -819,6 +819,12 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
   const isMobile = useIsMobile();
   const resultRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const isSupportOrAdmin = ['admin', 'suporte'].includes(
+    String((user as any)?.user_role ?? '').toLowerCase()
+  );
+
+  const [editModalConfig, setEditModalConfig] = useState<EditModalConfig | null>(null);
+  const [editFormData, setEditFormData] = useState<Record<string, string>>({});
 
   // Carregar título/descrição do módulo (do cadastro)
   useEffect(() => {
