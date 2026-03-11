@@ -1012,8 +1012,10 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           fx_poder_aquisitivo: editFormData.fx_poder_aquisitivo ?? '',
         };
       } else if (editModalConfig.section === 'dadosBasicos') {
+        const normalizedCpf = (editFormData.cpf ?? '').replace(/\D/g, '').trim();
+
         payload = {
-          cpf: (editFormData.cpf ?? '').replace(/\D/g, ''),
+          ...(normalizedCpf ? { cpf: normalizedCpf } : {}),
           nome: editFormData.nome ?? '',
           data_nascimento: editFormData.data_nascimento ?? '',
           sexo: editFormData.sexo ?? '',
