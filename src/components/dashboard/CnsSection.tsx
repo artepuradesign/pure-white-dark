@@ -4,9 +4,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Copy, FileText, SearchX, Pencil } from 'lucide-react';
+import { Copy, FileText, SearchX, Pencil, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import { format, isValid, parseISO } from 'date-fns';
 import { useBaseCns } from '@/hooks/useBaseCns';
 import type { BaseCns } from '@/services/baseCnsService';
 
@@ -14,13 +13,17 @@ interface CnsSectionProps {
   cpfId?: number;
   onCountChange?: (count: number) => void;
   onEdit?: () => void;
+  onEditRecord?: (record: BaseCns) => void;
+  onAddRecord?: () => void;
 }
+
 const tipoLabel = (t?: string | null) => {
   if (t === 'D') return 'Definitivo';
   if (t === 'P') return 'Provisório';
   return '';
 };
-const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange, onEdit }) => {
+
+const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange, onEdit, onEditRecord, onAddRecord }) => {
   const { isLoading, error, getCnsByCpfId } = useBaseCns();
   const [items, setItems] = useState<BaseCns[]>([]);
 
@@ -45,11 +48,7 @@ const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange, onEdit })
     const text = items
       .map((i, idx) => {
         const tipo = tipoLabel(i.tipo_cartao) || i.tipo_cartao;
-        return [
-          `CNS #${idx + 1}`,
-          `Número: ${i.numero_cns || '-'}`,
-          `Tipo: ${tipo || '-'}`,
-        ].join('\n');
+        return [`CNS #${idx + 1}`, `Número: ${i.numero_cns || '-'}`, `Tipo: ${tipo || '-'}`].join('\n');
       })
       .join('\n\n');
 
@@ -66,12 +65,7 @@ const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange, onEdit })
               <FileText className="h-5 w-5 flex-shrink-0" />
               <span className="truncate">CNS</span>
             </CardTitle>
-
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <Badge variant="secondary" className="uppercase tracking-wide">
-                Online
-              </Badge>
-            </div>
+            <Badge variant="secondary" className="uppercase tracking-wide">Online</Badge>
           </div>
         </CardHeader>
         <CardContent className="p-4 pt-0 md:p-6 md:pt-0">
@@ -94,42 +88,33 @@ const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange, onEdit })
           </CardTitle>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            {onEdit ? (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={onEdit}
-                className="h-8 w-8"
-                title="Editar dados da seção"
-              >
+            {onEdit && (
+              <Button variant="ghost" size="icon" onClick={onEdit} className="h-8 w-8" title="Editar dados da seção">
                 <Pencil className="h-4 w-4" />
               </Button>
-            ) : null}
+            )}
 
-            {hasData ? (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={copyData}
-                className="h-8 w-8"
-                title="Copiar dados da seção"
-              >
+            {onAddRecord && (
+              <Button variant="ghost" size="icon" onClick={onAddRecord} className="h-8 w-8" title="Adicionar novo registro">
+                <Plus className="h-4 w-4" />
+              </Button>
+            )}
+
+            {hasData && (
+              <Button variant="ghost" size="icon" onClick={copyData} className="h-8 w-8" title="Copiar dados da seção">
                 <Copy className="h-4 w-4" />
               </Button>
-            ) : null}
+            )}
 
             <div className="relative inline-flex">
-              <Badge variant="secondary" className="uppercase tracking-wide">
+              <Badge variant="secondary" className={hasData ? 'bg-success text-success-foreground uppercase tracking-wide pr-4' : 'uppercase tracking-wide pr-4'}>
                 Online
               </Badge>
-              {items.length > 0 ? (
-                <span
-                  className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                  aria-label={`Quantidade de CNS: ${items.length}`}
-                >
+              {hasData && (
+                <span className="absolute -top-2 -right-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground">
                   {items.length}
                 </span>
-              ) : null}
+              )}
             </div>
           </div>
         </div>
@@ -139,32 +124,31 @@ const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange, onEdit })
         {!hasData ? (
           <div className="text-center py-4 text-muted-foreground">
             <SearchX className="h-10 w-10 text-muted-foreground mx-auto mb-2" />
-            <p className="text-xs sm:text-sm">
-              {error ? error : 'Nenhum registro encontrado'}
-            </p>
+            <p className="text-xs sm:text-sm">{error ? error : 'Nenhum registro encontrado'}</p>
           </div>
         ) : (
           <div className="space-y-4">
-            {items.map((item) => (
-              <div key={item.id ?? item.numero_cns} className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="md:col-span-2">
-                  <Label className="text-xs sm:text-sm" htmlFor={`cns_numero_${item.id}`}>Número CNS</Label>
-                  <Input
-                    id={`cns_numero_${item.id}`}
-                    value={item.numero_cns || ''}
-                    disabled
-                    className="bg-muted text-[14px] md:text-sm"
-                  />
+            {items.map((item, index) => (
+              <div key={item.id ?? item.numero_cns} className="rounded-lg border border-border bg-muted/20 p-4 space-y-4">
+                <div className="flex items-center justify-between gap-2">
+                  <Badge variant="outline">Registro {index + 1}</Badge>
+                  {onEditRecord && (
+                    <Button variant="ghost" size="icon" className="h-8 w-8" title={`Editar registro ${index + 1}`} onClick={() => onEditRecord(item)}>
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
                 </div>
 
-                <div>
-                  <Label className="text-xs sm:text-sm" htmlFor={`cns_tipo_${item.id}`}>Tipo</Label>
-                  <Input
-                    id={`cns_tipo_${item.id}`}
-                    value={tipoLabel(item.tipo_cartao) || item.tipo_cartao || ''}
-                    disabled
-                    className="bg-muted text-[14px] md:text-sm"
-                  />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div className="md:col-span-2">
+                    <Label className="text-xs sm:text-sm" htmlFor={`cns_numero_${item.id}`}>Número CNS</Label>
+                    <Input id={`cns_numero_${item.id}`} value={item.numero_cns || ''} disabled className="bg-muted text-[14px] md:text-sm" />
+                  </div>
+
+                  <div>
+                    <Label className="text-xs sm:text-sm" htmlFor={`cns_tipo_${item.id}`}>Tipo</Label>
+                    <Input id={`cns_tipo_${item.id}`} value={tipoLabel(item.tipo_cartao) || item.tipo_cartao || ''} disabled className="bg-muted text-[14px] md:text-sm" />
+                  </div>
                 </div>
               </div>
             ))}
