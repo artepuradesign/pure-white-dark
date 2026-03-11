@@ -10,9 +10,10 @@ import { toast } from "sonner";
 
 interface AuxilioEmergencialSectionProps {
   auxilios: BaseAuxilioEmergencial[];
+  onEdit?: () => void;
 }
 
-export const AuxilioEmergencialSection = ({ auxilios }: AuxilioEmergencialSectionProps) => {
+export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergencialSectionProps) => {
   const hasData = useMemo(() => (auxilios?.length ?? 0) > 0, [auxilios?.length]);
   const sectionCardClass = useMemo(
     () => (hasData ? 'border-success-border bg-success-subtle' : undefined),
