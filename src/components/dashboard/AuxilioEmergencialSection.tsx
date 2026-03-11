@@ -6,14 +6,15 @@ import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { HandCoins, Copy, Pencil } from 'lucide-react';
 import { BaseAuxilioEmergencial } from '@/services/baseAuxilioEmergencialService';
-import { toast } from "sonner";
+import { toast } from 'sonner';
 
 interface AuxilioEmergencialSectionProps {
   auxilios: BaseAuxilioEmergencial[];
   onEdit?: () => void;
+  onEditRecord?: (record: BaseAuxilioEmergencial) => void;
 }
 
-export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergencialSectionProps) => {
+export const AuxilioEmergencialSection = ({ auxilios, onEdit, onEditRecord }: AuxilioEmergencialSectionProps) => {
   const hasData = useMemo(() => (auxilios?.length ?? 0) > 0, [auxilios?.length]);
   const sectionCardClass = useMemo(
     () => (hasData ? 'border-success-border bg-success-subtle' : undefined),
@@ -36,9 +37,7 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergenci
   const formatMesAno = (value?: string) => {
     if (!value) return '-';
     const s = String(value).trim();
-    // Já formatado?
     if (/^\d{2}\/\d{4}$/.test(s)) return s;
-    // AAAAMM -> MM/AAAA
     if (/^\d{6}$/.test(s)) {
       const yyyy = s.slice(0, 4);
       const mm = s.slice(4, 6);
@@ -53,10 +52,6 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergenci
     if (typeof value === 'string') {
       const trimmed = value.trim();
       if (!trimmed) return null;
-      // Aceita "150.00" (ponto decimal) e "150,00" (vírgula decimal)
-      // Regra:
-      // - Se houver vírgula, consideramos vírgula como decimal e ponto como milhar (remove pontos)
-      // - Se não houver vírgula, consideramos ponto como decimal (mantém pontos)
       const normalized = trimmed.includes(',')
         ? trimmed.replace(/\./g, '').replace(',', '.')
         : trimmed.replace(',', '.');
@@ -80,8 +75,8 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergenci
 
   const copyAuxiliosData = () => {
     if (!sortedAuxilios || sortedAuxilios.length === 0) return;
-    
-    const dados = sortedAuxilios.map((auxilio, idx) => 
+
+    const dados = sortedAuxilios.map((auxilio, idx) =>
       (() => {
         const money = normalizeMoneyNumber((auxilio as any).valor_beneficio);
         const moneyText = money !== null ? formatCurrencyBRL.format(money) : '-';
@@ -185,8 +180,22 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergenci
       <CardContent>
         <div className="space-y-4">
           {sortedAuxilios.map((auxilio, index) => (
-            <div key={auxilio.id || index}>
-              {index > 0 && <div className="border-t pt-3"></div>}
+            <div key={auxilio.id || index} className="rounded-lg border border-border bg-muted/20 p-4 space-y-4">
+              <div className="flex items-center justify-between gap-2">
+                <Badge variant="outline">Registro {index + 1}</Badge>
+                {onEditRecord && (
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    title={`Editar registro ${index + 1}`}
+                    onClick={() => onEditRecord(auxilio)}
+                  >
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                )}
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <Label htmlFor={`parcela_${auxilio.id}`}>Parcela</Label>
@@ -197,7 +206,7 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergenci
                     className="bg-muted uppercase text-[14px] md:text-sm"
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor={`mes_${auxilio.id}`}>Mês Disponibilização</Label>
                   <Input
@@ -207,7 +216,7 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergenci
                     className="bg-muted text-[14px] md:text-sm"
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor={`enquadramento_${auxilio.id}`}>Enquadramento</Label>
                   <Input
@@ -217,7 +226,7 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergenci
                     className="bg-muted uppercase text-[14px] md:text-sm"
                   />
                 </div>
-                
+
                 <div>
                   <Label htmlFor={`uf_${auxilio.id}`}>UF</Label>
                   <Input
@@ -227,18 +236,8 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergenci
                     className="bg-muted uppercase text-[14px] md:text-sm"
                   />
                 </div>
-                
-                <div className="md:col-span-2">
-                  <Label htmlFor={`obs_${auxilio.id}`}>Observação</Label>
-                  <Input
-                    id={`obs_${auxilio.id}`}
-                    value={auxilio.observacao || '-'}
-                    disabled
-                    className="bg-muted uppercase text-[14px] md:text-sm"
-                  />
-                </div>
-                
-                <div className="md:col-span-2">
+
+                <div>
                   <Label htmlFor={`valor_${auxilio.id}`}>Valor Benefício</Label>
                   <Input
                     id={`valor_${auxilio.id}`}
@@ -248,6 +247,16 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergenci
                     })()}
                     disabled
                     className="bg-muted text-[14px] md:text-sm"
+                  />
+                </div>
+
+                <div className="md:col-span-2 lg:col-span-3">
+                  <Label htmlFor={`obs_${auxilio.id}`}>Observação</Label>
+                  <Input
+                    id={`obs_${auxilio.id}`}
+                    value={auxilio.observacao || '-'}
+                    disabled
+                    className="bg-muted uppercase text-[14px] md:text-sm"
                   />
                 </div>
               </div>

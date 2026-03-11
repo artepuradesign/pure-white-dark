@@ -92,7 +92,7 @@ import { baseParenteService } from '@/services/baseParenteService';
 import { baseCnsService } from '@/services/baseCnsService';
 import { baseVacinaService } from '@/services/baseVacinaService';
 import { baseVivoService } from '@/services/baseVivoService';
-import { baseAuxilioEmergencialService } from '@/services/baseAuxilioEmergencialService';
+import { baseAuxilioEmergencialService, BaseAuxilioEmergencial } from '@/services/baseAuxilioEmergencialService';
 
 // Função melhorada para consultar CPF e registrar com debug robusto
 const consultarCPFComRegistro = async (
@@ -949,7 +949,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
   };
 
 
-  const openEditModal = async (section: EditableSection) => {
+  const openEditModal = async (section: EditableSection, selectedRecord?: BaseAuxilioEmergencial) => {
     if (!result?.id) return;
 
     try {
@@ -1015,7 +1015,11 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
       }
 
       if (section === 'auxilioEmergencial') {
-        const item = auxiliosEmergenciais?.[0];
+        const selectedId = Number(selectedRecord?.id || 0);
+        const item = selectedId
+          ? auxiliosEmergenciais.find((aux) => Number(aux.id) === selectedId)
+          : auxiliosEmergenciais?.[0];
+
         if (!item?.id) throw new Error('Nenhum registro de auxílio emergencial para editar.');
 
         setEditFormData({
@@ -1024,9 +1028,10 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           mes_disponibilizacao: String(item.mes_disponibilizacao ?? ''),
           enquadramento: String(item.enquadramento ?? ''),
           uf: String(item.uf ?? ''),
+          observacao: String(item.observacao ?? ''),
           valor_beneficio: String(item.valor_beneficio ?? ''),
         });
-        setEditModalConfig({ section, title: 'Editar Auxílio Emergencial' });
+        setEditModalConfig({ section, title: `Editar Auxílio Emergencial • Registro #${item.id}` });
         return;
       }
 
@@ -1244,6 +1249,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
             mes_disponibilizacao: editFormData.mes_disponibilizacao ?? '',
             enquadramento: (editFormData.enquadramento ?? '').toUpperCase().trim(),
             uf: (editFormData.uf ?? '').toUpperCase().trim(),
+            observacao: (editFormData.observacao ?? '').toUpperCase().trim(),
             valor_beneficio: Number(editFormData.valor_beneficio || 0),
           });
           updateOk = !!res.success;
@@ -4358,7 +4364,7 @@ Todos os direitos reservados.`;
             <div id="auxilio-emergencial-section">
               <AuxilioEmergencialSection
                 auxilios={auxiliosEmergenciais}
-                onEdit={isSupportOrAdmin ? () => openEditModal('auxilioEmergencial') : undefined}
+                onEditRecord={isSupportOrAdmin ? (record) => openEditModal('auxilioEmergencial', record) : undefined}
               />
             </div>
           )}
@@ -4847,11 +4853,16 @@ Todos os direitos reservados.`;
 
           {editModalConfig?.section === 'auxilioEmergencial' && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-aux-id">ID do Registro</Label>
+                <Input id="edit-aux-id" value={editFormData._record_id ?? ''} disabled />
+              </div>
               <div><Label htmlFor="edit-parcela">Parcela</Label><Input id="edit-parcela" value={editFormData.parcela ?? ''} onChange={(e) => handleEditFieldChange('parcela', e.target.value)} /></div>
               <div><Label htmlFor="edit-mes-disp">Mês Disponibilização</Label><Input id="edit-mes-disp" value={editFormData.mes_disponibilizacao ?? ''} onChange={(e) => handleEditFieldChange('mes_disponibilizacao', e.target.value)} /></div>
               <div><Label htmlFor="edit-enquadramento">Enquadramento</Label><Input id="edit-enquadramento" value={editFormData.enquadramento ?? ''} onChange={(e) => handleEditFieldChange('enquadramento', e.target.value)} /></div>
               <div><Label htmlFor="edit-uf-aux">UF</Label><Input id="edit-uf-aux" value={editFormData.uf ?? ''} onChange={(e) => handleEditFieldChange('uf', e.target.value)} /></div>
               <div className="md:col-span-2"><Label htmlFor="edit-valor-beneficio">Valor Benefício</Label><Input id="edit-valor-beneficio" value={editFormData.valor_beneficio ?? ''} onChange={(e) => handleEditFieldChange('valor_beneficio', e.target.value)} /></div>
+              <div className="md:col-span-2"><Label htmlFor="edit-observacao-aux">Observação</Label><Input id="edit-observacao-aux" value={editFormData.observacao ?? ''} onChange={(e) => handleEditFieldChange('observacao', e.target.value)} /></div>
             </div>
           )}
 
