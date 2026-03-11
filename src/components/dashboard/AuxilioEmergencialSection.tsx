@@ -175,18 +175,20 @@ export const AuxilioEmergencialSection = ({ auxilios, onEdit, onEditRecord, onAd
               </Button>
             )}
 
-            <Badge
-              variant="secondary"
-              className={hasData ? 'bg-success text-success-foreground uppercase tracking-wide' : 'uppercase tracking-wide'}
-            >
-              Online
-            </Badge>
-
-            {hasData && (
-              <Badge variant="secondary" className="bg-success text-success-foreground">
-                {auxilios.length}
+            <div className="relative inline-flex">
+              <Badge
+                variant="secondary"
+                className={hasData ? 'bg-success text-success-foreground uppercase tracking-wide pr-4' : 'uppercase tracking-wide pr-4'}
+              >
+                Online
               </Badge>
-            )}
+
+              {hasData && (
+                <span className="absolute -top-2 -right-2 inline-flex min-h-5 min-w-5 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground">
+                  {auxilios.length}
+                </span>
+              )}
+            </div>
           </div>
         </div>
       </CardHeader>
