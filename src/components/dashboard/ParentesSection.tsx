@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { User, Copy } from 'lucide-react';
+import { User, Copy, Pencil } from 'lucide-react';
 import { useBaseParente } from '@/hooks/useBaseParente';
 import { BaseParente } from '@/services/baseParenteService';
 import { formatCpf } from '@/utils/formatters';
