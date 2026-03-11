@@ -4383,7 +4383,8 @@ Todos os direitos reservados.`;
                 key={`telefones-${sectionsRefreshKey}`}
                 cpfId={result.id}
                 onCountChange={setTelefonesCount}
-                onEdit={isSupportOrAdmin ? () => openEditModal('telefones') : undefined}
+                onAddRecord={isSupportOrAdmin ? () => openAddSectionModal('telefones') : undefined}
+                onEditRecord={isSupportOrAdmin ? (record) => openEditModal('telefones', record) : undefined}
               />
             </div>
           )}
