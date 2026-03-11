@@ -963,6 +963,163 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
   };
 
 
+  const resolveCurrentCpfId = async () => {
+    if (result?.id) return result.id;
+
+    if (result?.cpf) {
+      const lookup = await baseCpfService.getByCpf(String(result.cpf).replace(/\D/g, ''));
+      if (lookup.success && lookup.data?.id) return lookup.data.id;
+    }
+
+    throw new Error('Não foi possível identificar o CPF para salvar no banco.');
+  };
+
+  const getAddSectionDefaults = (section: AddableSection): Record<string, string> => {
+    switch (section) {
+      case 'telefones':
+        return { ddd: '', telefone: '', tipo_texto: 'Celular', classificacao: '', sigilo: '0', data_inclusao: '' };
+      case 'emails':
+        return { email: '', score_email: '', email_pessoal: '', prioridade: '', email_duplicado: '', blacklist: '', estrutura: '', status_vt: '', dominio: '', mapas: '', peso: '', data_inclusao: '' };
+      case 'enderecos':
+        return { cep: '', logradouro: '', numero: '', complemento: '', bairro: '', cidade: '', uf: '' };
+      case 'parentes':
+        return { nome_vinculo: '', vinculo: '', cpf_vinculo: '' };
+      case 'cns':
+        return { numero_cns: '', tipo_cartao: 'D' };
+      case 'vacinas':
+        return {
+          nome_vacina: '', descricao_vacina: '', lote_vacina: '', grupo_atendimento: '', data_aplicacao: '', status: '',
+          nome_estabelecimento: '', aplicador_vacina: '', vaina: '', cor: '', cns: '', mae: '', uf: '', municipio: '', bairro: '', cep: ''
+        };
+      default:
+        return {};
+    }
+  };
+
+  const openAddSectionModal = (section: AddableSection) => {
+    const sectionTitles: Record<AddableSection, string> = {
+      telefones: 'Adicionar registro de Telefones',
+      emails: 'Adicionar registro de Emails',
+      enderecos: 'Adicionar registro de Endereços',
+      parentes: 'Adicionar registro de Parentes',
+      cns: 'Adicionar registro de CNS',
+      vacinas: 'Adicionar registro de Vacinas',
+    };
+
+    setAddSectionFormData(getAddSectionDefaults(section));
+    setAddSectionModalConfig({ section, title: sectionTitles[section] });
+  };
+
+  const handleAddSectionFieldChange = (field: string, value: string) => {
+    setAddSectionFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleCreateSectionRecord = async () => {
+    if (!addSectionModalConfig || !result) return;
+
+    setSavingAddSection(true);
+
+    try {
+      const cpfId = await resolveCurrentCpfId();
+      const section = addSectionModalConfig.section;
+
+      const tipoCodigoMap: Record<string, string> = {
+        Residencial: 'R', Comercial: 'C', Celular: 'M', WhatsApp: 'W', Outro: 'O'
+      };
+
+      let createOk = false;
+
+      if (section === 'telefones') {
+        const res = await baseTelefoneService.create({
+          cpf_id: cpfId,
+          ddd: (addSectionFormData.ddd ?? '').replace(/\D/g, ''),
+          telefone: (addSectionFormData.telefone ?? '').replace(/\D/g, ''),
+          tipo_texto: (addSectionFormData.tipo_texto as any) || 'Celular',
+          tipo_codigo: tipoCodigoMap[addSectionFormData.tipo_texto || 'Celular'] || 'M',
+          classificacao: (addSectionFormData.classificacao ?? '').toUpperCase().trim() || undefined,
+          sigilo: Number(addSectionFormData.sigilo || 0),
+          data_inclusao: addSectionFormData.data_inclusao || undefined,
+        } as any);
+        createOk = !!res.success;
+      } else if (section === 'emails') {
+        const res = await baseEmailService.create({
+          cpf_id: cpfId,
+          email: (addSectionFormData.email ?? '').toLowerCase().trim(),
+          score_email: (addSectionFormData.score_email || null) as any,
+          email_pessoal: (addSectionFormData.email_pessoal || null) as any,
+          prioridade: addSectionFormData.prioridade ? Number(addSectionFormData.prioridade) : null,
+          email_duplicado: (addSectionFormData.email_duplicado || null) as any,
+          blacklist: (addSectionFormData.blacklist || null) as any,
+          estrutura: (addSectionFormData.estrutura ?? '').toUpperCase().trim() || null,
+          status_vt: (addSectionFormData.status_vt ?? '').toUpperCase().trim() || null,
+          dominio: (addSectionFormData.dominio ?? '').toLowerCase().trim() || null,
+          mapas: addSectionFormData.mapas ? Number(addSectionFormData.mapas) : null,
+          peso: addSectionFormData.peso ? Number(addSectionFormData.peso) : null,
+          data_inclusao: addSectionFormData.data_inclusao || null,
+        } as any);
+        createOk = !!res.success;
+      } else if (section === 'enderecos') {
+        const res = await baseEnderecoService.create({
+          cpf_id: cpfId,
+          cep: (addSectionFormData.cep ?? '').replace(/\D/g, ''),
+          logradouro: (addSectionFormData.logradouro ?? '').toUpperCase().trim(),
+          numero: addSectionFormData.numero ?? '',
+          complemento: (addSectionFormData.complemento ?? '').toUpperCase().trim(),
+          bairro: (addSectionFormData.bairro ?? '').toUpperCase().trim(),
+          cidade: (addSectionFormData.cidade ?? '').toUpperCase().trim(),
+          uf: (addSectionFormData.uf ?? '').toUpperCase().trim(),
+        });
+        createOk = !!res.success;
+      } else if (section === 'parentes') {
+        const res = await baseParenteService.create({
+          cpf_id: cpfId,
+          nome_vinculo: (addSectionFormData.nome_vinculo ?? '').toUpperCase().trim(),
+          vinculo: (addSectionFormData.vinculo ?? '').toUpperCase().trim(),
+          cpf_vinculo: (addSectionFormData.cpf_vinculo ?? '').replace(/\D/g, ''),
+        });
+        createOk = !!res.success;
+      } else if (section === 'cns') {
+        const res = await baseCnsService.create({
+          cpf_id: cpfId,
+          numero_cns: (addSectionFormData.numero_cns ?? '').replace(/\D/g, ''),
+          tipo_cartao: ((addSectionFormData.tipo_cartao || 'D').toUpperCase() === 'P' ? 'P' : 'D') as any,
+        });
+        createOk = !!res.success;
+      } else if (section === 'vacinas') {
+        const res = await baseVacinaService.create({
+          cpf_id: cpfId,
+          nome_vacina: (addSectionFormData.nome_vacina ?? '').toUpperCase().trim(),
+          descricao_vacina: (addSectionFormData.descricao_vacina ?? '').toUpperCase().trim(),
+          lote_vacina: (addSectionFormData.lote_vacina ?? '').toUpperCase().trim(),
+          grupo_atendimento: (addSectionFormData.grupo_atendimento ?? '').toUpperCase().trim(),
+          data_aplicacao: addSectionFormData.data_aplicacao ?? '',
+          status: (addSectionFormData.status ?? '').toUpperCase().trim(),
+          nome_estabelecimento: (addSectionFormData.nome_estabelecimento ?? '').toUpperCase().trim(),
+          aplicador_vacina: (addSectionFormData.aplicador_vacina ?? '').toUpperCase().trim(),
+          vaina: (addSectionFormData.vaina ?? '').toUpperCase().trim(),
+          cor: (addSectionFormData.cor ?? '').toUpperCase().trim(),
+          cns: (addSectionFormData.cns ?? '').replace(/\D/g, ''),
+          mae: (addSectionFormData.mae ?? '').toUpperCase().trim(),
+          uf: (addSectionFormData.uf ?? '').toUpperCase().trim(),
+          municipio: (addSectionFormData.municipio ?? '').toUpperCase().trim(),
+          bairro: (addSectionFormData.bairro ?? '').toUpperCase().trim(),
+          cep: (addSectionFormData.cep ?? '').replace(/\D/g, ''),
+        });
+        createOk = !!res.success;
+      }
+
+      if (!createOk) throw new Error('Erro ao adicionar registro nesta seção.');
+
+      setSectionsRefreshKey((prev) => prev + 1);
+      setAddSectionModalConfig(null);
+      toast.success('Registro adicionado com sucesso!');
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Erro ao adicionar registro.');
+    } finally {
+      setSavingAddSection(false);
+    }
+  };
+
   const openAddAuxilioModal = () => {
     setAddAuxilioFormData({
       parcela: '',
