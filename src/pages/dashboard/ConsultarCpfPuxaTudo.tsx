@@ -4510,7 +4510,8 @@ Todos os direitos reservados.`;
                 key={`parentes-${sectionsRefreshKey}`}
                 cpfId={result.id}
                 onCountChange={setParentesCount}
-                onEdit={isSupportOrAdmin ? () => openEditModal('parentes') : undefined}
+                onAddRecord={isSupportOrAdmin ? () => openAddSectionModal('parentes') : undefined}
+                onEditRecord={isSupportOrAdmin ? (record) => openEditModal('parentes', record) : undefined}
               />
             </div>
           )}
