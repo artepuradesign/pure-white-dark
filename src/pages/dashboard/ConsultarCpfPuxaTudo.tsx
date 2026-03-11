@@ -1273,7 +1273,8 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
       };
 
       const records = await loaders[section]();
-      const item = records?.[0];
+      const selectedId = Number(selectedRecord?.id || 0);
+      const item = selectedId ? records?.find((record: any) => Number(record?.id) === selectedId) : records?.[0];
       if (!item?.id) throw new Error('Nenhum registro encontrado para edição nesta seção.');
 
       const mapBySection: Record<string, Record<string, string>> = {
