@@ -11,9 +11,10 @@ import { toast } from "sonner";
 interface VivoSectionProps {
   cpfId: number;
   onCountChange?: (count: number) => void;
+  onEdit?: () => void;
 }
 
-const VivoSection: React.FC<VivoSectionProps> = ({ cpfId, onCountChange }) => {
+const VivoSection: React.FC<VivoSectionProps> = ({ cpfId, onCountChange, onEdit }) => {
   const { getVivosByCpfId, vivos, isLoading } = useBaseVivo();
   const [dataLoaded, setDataLoaded] = useState(false);
   const hasData = (vivos?.length || 0) > 0;
