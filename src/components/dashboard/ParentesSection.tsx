@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { User, Copy } from 'lucide-react';
+import { User, Copy, Pencil } from 'lucide-react';
 import { useBaseParente } from '@/hooks/useBaseParente';
 import { BaseParente } from '@/services/baseParenteService';
 import { formatCpf } from '@/utils/formatters';
@@ -13,9 +13,10 @@ import { toast } from "sonner";
 interface ParentesSectionProps {
   cpfId: number;
   onCountChange?: (count: number) => void;
+  onEdit?: () => void;
 }
 
-const ParentesSection: React.FC<ParentesSectionProps> = ({ cpfId, onCountChange }) => {
+const ParentesSection: React.FC<ParentesSectionProps> = ({ cpfId, onCountChange, onEdit }) => {
   const [parentes, setParentes] = useState<BaseParente[]>([]);
   const [loading, setLoading] = useState(true);
   const { getParentesByCpfId } = useBaseParente();
@@ -92,6 +93,18 @@ const ParentesSection: React.FC<ParentesSectionProps> = ({ cpfId, onCountChange 
           </CardTitle>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEdit}
+                className="h-8 w-8"
+                title="Editar dados da seção"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+
             {parentes.length > 0 && (
               <Button
                 variant="ghost"

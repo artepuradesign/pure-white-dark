@@ -4,16 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Copy } from 'lucide-react';
+import { MapPin, Copy, Pencil } from 'lucide-react';
 import { useBaseEndereco, BaseEndereco } from '@/hooks/useBaseEndereco';
 import { toast } from "sonner";
 
 interface EnderecosSectionProps {
   cpfId?: number;
   onCountChange?: (count: number) => void;
+  onEdit?: () => void;
 }
 
-const EnderecosSection: React.FC<EnderecosSectionProps> = ({ cpfId, onCountChange }) => {
+const EnderecosSection: React.FC<EnderecosSectionProps> = ({ cpfId, onCountChange, onEdit }) => {
   const { isLoading, getEnderecosByCpfId } = useBaseEndereco();
   const [enderecos, setEnderecos] = useState<BaseEndereco[]>([]);
   const [didLoad, setDidLoad] = useState(false);
@@ -92,6 +93,18 @@ const EnderecosSection: React.FC<EnderecosSectionProps> = ({ cpfId, onCountChang
           </CardTitle>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEdit}
+                className="h-8 w-8"
+                title="Editar dados da seção"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+
             {enderecos.length > 0 && (
               <Button
                 variant="ghost"

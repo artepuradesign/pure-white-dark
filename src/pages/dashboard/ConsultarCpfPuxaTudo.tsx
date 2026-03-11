@@ -4151,42 +4151,36 @@ Todos os direitos reservados.`;
           {showTelefonesSection && (
             <div id="telefones-section" className={telefonesCount === 0 ? 'hidden' : ''}>
               
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('telefones')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-              <TelefonesSection key={`telefones-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setTelefonesCount} />
+              <TelefonesSection
+                key={`telefones-${sectionsRefreshKey}`}
+                cpfId={result.id}
+                onCountChange={setTelefonesCount}
+                onEdit={isSupportOrAdmin ? () => openEditModal('telefones') : undefined}
+              />
             </div>
           )}
 
           {showEmailsSection && (
             <div id="emails-section" className={emailsCount === 0 ? 'hidden' : ''}>
               
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('emails')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-              <EmailsSection key={`emails-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEmailsCount} />
+              <EmailsSection
+                key={`emails-${sectionsRefreshKey}`}
+                cpfId={result.id}
+                onCountChange={setEmailsCount}
+                onEdit={isSupportOrAdmin ? () => openEditModal('emails') : undefined}
+              />
             </div>
           )}
 
           {showEnderecosSection && (
             <div id="enderecos-section" className={enderecosCount === 0 ? 'hidden' : ''}>
               
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('enderecos')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-              <EnderecosSection key={`enderecos-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEnderecosCount} />
+              <EnderecosSection
+                key={`enderecos-${sectionsRefreshKey}`}
+                cpfId={result.id}
+                onCountChange={setEnderecosCount}
+                onEdit={isSupportOrAdmin ? () => openEditModal('enderecos') : undefined}
+              />
             </div>
           )}
 
@@ -4281,14 +4275,12 @@ Todos os direitos reservados.`;
           {/* Parentes */}
           {!isRestrictToBasicAndCertidao && showParentesSection && (
             <div id="parentes-section" className={parentesCount === 0 ? 'hidden' : ''}>
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('parentes')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-              <ParentesSection key={`parentes-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setParentesCount} />
+              <ParentesSection
+                key={`parentes-${sectionsRefreshKey}`}
+                cpfId={result.id}
+                onCountChange={setParentesCount}
+                onEdit={isSupportOrAdmin ? () => openEditModal('parentes') : undefined}
+              />
             </div>
           )}
 
@@ -4309,42 +4301,34 @@ Todos os direitos reservados.`;
           {/* CNS */}
           {(!isSlimMode || isExclusiveMode) && showCnsSection && (
             <div id="cns-section" className={cnsCount === 0 ? 'hidden' : ''}>
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('cns')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-              <CnsSection key={`cns-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setCnsCount} />
+              <CnsSection
+                key={`cns-${sectionsRefreshKey}`}
+                cpfId={result.id}
+                onCountChange={setCnsCount}
+                onEdit={isSupportOrAdmin ? () => openEditModal('cns') : undefined}
+              />
             </div>
           )}
 
           {/* PIS */}
           {(!isSlimMode || isExclusiveMode) && showPisSection && pisCount > 0 && (
             <div id="pis-section">
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('pis')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-              <PisSection pis={result.pis} />
+              <PisSection
+                pis={result.pis}
+                onEdit={isSupportOrAdmin ? () => openEditModal('pis') : undefined}
+              />
             </div>
           )}
 
           {/* Vacinas */}
           {(!isSlimMode || isExclusiveMode) && showVacinasSection && (
             <div id="vacinas-section" className={vacinasCount === 0 ? 'hidden' : ''}>
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('vacinas')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-              <VacinaDisplay key={`vacinas-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVacinasCount} />
+              <VacinaDisplay
+                key={`vacinas-${sectionsRefreshKey}`}
+                cpfId={result.id}
+                onCountChange={setVacinasCount}
+                onEdit={isSupportOrAdmin ? () => openEditModal('vacinas') : undefined}
+              />
             </div>
           )}
 
@@ -4372,14 +4356,10 @@ Todos os direitos reservados.`;
           {/* Auxílio Emergencial */}
           {(!isSlimMode || isExclusiveMode) && showAuxilioEmergencialSection && (auxiliosEmergenciais?.length ?? 0) > 0 && (
             <div id="auxilio-emergencial-section">
-              {isSupportOrAdmin && (
-                <div className="flex justify-end mb-2">
-                  <Button variant="ghost" size="icon" onClick={() => openEditModal('auxilioEmergencial')} title="Editar dados da seção">
-                    <Pencil className="h-4 w-4" />
-                  </Button>
-                </div>
-              )}
-              <AuxilioEmergencialSection auxilios={auxiliosEmergenciais} />
+              <AuxilioEmergencialSection
+                auxilios={auxiliosEmergenciais}
+                onEdit={isSupportOrAdmin ? () => openEditModal('auxilioEmergencial') : undefined}
+              />
             </div>
           )}
 
@@ -4405,14 +4385,12 @@ Todos os direitos reservados.`;
               </div>
 
               <div id="vivo-section" className={vivoCount === 0 ? 'hidden' : ''}>
-                {isSupportOrAdmin && (
-                  <div className="flex justify-end mb-2">
-                    <Button variant="ghost" size="icon" onClick={() => openEditModal('operadoraVivo')} title="Editar dados da seção">
-                      <Pencil className="h-4 w-4" />
-                    </Button>
-                  </div>
-                )}
-                <VivoSection key={`vivo-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVivoCount} />
+                <VivoSection
+                  key={`vivo-${sectionsRefreshKey}`}
+                  cpfId={result.id}
+                  onCountChange={setVivoCount}
+                  onEdit={isSupportOrAdmin ? () => openEditModal('operadoraVivo') : undefined}
+                />
               </div>
 
               <div id="tim-section" className={timCount === 0 ? 'hidden' : ''}>

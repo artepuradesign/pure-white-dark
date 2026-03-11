@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { Shield, Copy } from 'lucide-react';
+import { Shield, Copy, Pencil } from 'lucide-react';
 import { BaseVacina } from '@/services/baseVacinaService';
 import { useBaseVacina } from '@/hooks/useBaseVacina';
 import { toast } from "sonner";
@@ -12,9 +12,10 @@ import { toast } from "sonner";
 interface VacinaDisplayProps {
   cpfId: number;
   onCountChange?: (count: number) => void;
+  onEdit?: () => void;
 }
 
-const VacinaDisplay = ({ cpfId, onCountChange }: VacinaDisplayProps) => {
+const VacinaDisplay = ({ cpfId, onCountChange, onEdit }: VacinaDisplayProps) => {
   const [vacinas, setVacinas] = useState<BaseVacina[]>([]);
   const [loading, setLoading] = useState(true);
   const { getVacinasByCpfId } = useBaseVacina();
@@ -149,6 +150,18 @@ const VacinaDisplay = ({ cpfId, onCountChange }: VacinaDisplayProps) => {
           </CardTitle>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEdit}
+                className="h-8 w-8"
+                title="Editar dados da seção"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+
             {hasData && (
               <Button
                 variant="ghost"

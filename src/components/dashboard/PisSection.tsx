@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Copy, FileText, SearchX } from 'lucide-react';
+import { Copy, FileText, SearchX, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 
 const normalizeText = (value: unknown): string => {
@@ -17,9 +17,10 @@ const normalizeText = (value: unknown): string => {
 
 interface PisSectionProps {
   pis?: string | null;
+  onEdit?: () => void;
 }
 
-const PisSection: React.FC<PisSectionProps> = ({ pis }) => {
+const PisSection: React.FC<PisSectionProps> = ({ pis, onEdit }) => {
   const pisValue = normalizeText(pis);
   const hasData = useMemo(() => !!pisValue, [pisValue]);
   const sectionCardClass = hasData ? 'border-success-border bg-success-subtle' : '';
@@ -44,6 +45,18 @@ const PisSection: React.FC<PisSectionProps> = ({ pis }) => {
           </CardTitle>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEdit}
+                className="h-8 w-8"
+                title="Editar dados da seção"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+
             {hasData && (
               <Button
                 variant="ghost"

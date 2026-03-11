@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Copy, FileText, SearchX } from 'lucide-react';
+import { Copy, FileText, SearchX, Pencil } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, isValid, parseISO } from 'date-fns';
 import { useBaseCns } from '@/hooks/useBaseCns';
@@ -13,24 +13,14 @@ import type { BaseCns } from '@/services/baseCnsService';
 interface CnsSectionProps {
   cpfId?: number;
   onCountChange?: (count: number) => void;
+  onEdit?: () => void;
 }
-
-const formatBrazilianDate = (value?: string | null) => {
-  if (!value) return '';
-  const iso = parseISO(value);
-  if (isValid(iso)) return format(iso, 'dd/MM/yyyy');
-  const d = new Date(value);
-  if (isValid(d)) return format(d, 'dd/MM/yyyy');
-  return value;
-};
-
 const tipoLabel = (t?: string | null) => {
   if (t === 'D') return 'Definitivo';
   if (t === 'P') return 'Provisório';
   return '';
 };
-
-const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange }) => {
+const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange, onEdit }) => {
   const { isLoading, error, getCnsByCpfId } = useBaseCns();
   const [items, setItems] = useState<BaseCns[]>([]);
 
@@ -104,6 +94,18 @@ const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange }) => {
           </CardTitle>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            {onEdit ? (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEdit}
+                className="h-8 w-8"
+                title="Editar dados da seção"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            ) : null}
+
             {hasData ? (
               <Button
                 variant="ghost"

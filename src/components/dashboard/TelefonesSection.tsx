@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Phone, Copy } from 'lucide-react';
+import { Phone, Copy, Pencil } from 'lucide-react';
 import { useBaseTelefone } from '@/hooks/useBaseTelefone';
 import { BaseTelefone } from '@/services/baseTelefoneService';
 import { toast } from "sonner";
@@ -23,9 +23,10 @@ interface TelefonesSectionProps {
   onCountChange?: (count: number) => void;
   /** Modo compacto para telas específicas (ex.: CPF Simples) */
   compact?: boolean;
+  onEdit?: () => void;
 }
 
-const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChange, compact = false }) => {
+const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChange, compact = false, onEdit }) => {
   const { isLoading, getTelefonesByCpfId } = useBaseTelefone();
   const [telefones, setTelefones] = useState<BaseTelefone[]>([]);
   const [didLoad, setDidLoad] = useState(false);
@@ -105,6 +106,18 @@ const TelefonesSection: React.FC<TelefonesSectionProps> = ({ cpfId, onCountChang
           </CardTitle>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEdit}
+                className="h-8 w-8"
+                title="Editar dados da seção"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+
             {telefones.length > 0 && (
               <Button
                 variant="ghost"

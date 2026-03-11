@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Mail, Copy } from 'lucide-react';
+import { Mail, Copy, Pencil } from 'lucide-react';
 import { useBaseEmail } from '@/hooks/useBaseEmail';
 import { BaseEmail } from '@/services/baseEmailService';
 import { toast } from "sonner";
@@ -15,9 +15,10 @@ interface EmailsSectionProps {
   onCountChange?: (count: number) => void;
   /** Modo compacto para telas específicas (ex.: CPF Simples) */
   compact?: boolean;
+  onEdit?: () => void;
 }
 
-const EmailsSection: React.FC<EmailsSectionProps> = ({ cpfId, onCountChange, compact = false }) => {
+const EmailsSection: React.FC<EmailsSectionProps> = ({ cpfId, onCountChange, compact = false, onEdit }) => {
   const { isLoading, getEmailsByCpfId } = useBaseEmail();
   const [emails, setEmails] = useState<BaseEmail[]>([]);
   const [didLoad, setDidLoad] = useState(false);
@@ -108,6 +109,18 @@ const EmailsSection: React.FC<EmailsSectionProps> = ({ cpfId, onCountChange, com
           </CardTitle>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEdit}
+                className="h-8 w-8"
+                title="Editar dados da seção"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+
             {emails.length > 0 && (
               <Button
                 variant="ghost"

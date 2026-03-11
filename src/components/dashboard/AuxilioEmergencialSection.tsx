@@ -4,15 +4,16 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
-import { HandCoins, Copy } from 'lucide-react';
+import { HandCoins, Copy, Pencil } from 'lucide-react';
 import { BaseAuxilioEmergencial } from '@/services/baseAuxilioEmergencialService';
 import { toast } from "sonner";
 
 interface AuxilioEmergencialSectionProps {
   auxilios: BaseAuxilioEmergencial[];
+  onEdit?: () => void;
 }
 
-export const AuxilioEmergencialSection = ({ auxilios }: AuxilioEmergencialSectionProps) => {
+export const AuxilioEmergencialSection = ({ auxilios, onEdit }: AuxilioEmergencialSectionProps) => {
   const hasData = useMemo(() => (auxilios?.length ?? 0) > 0, [auxilios?.length]);
   const sectionCardClass = useMemo(
     () => (hasData ? 'border-success-border bg-success-subtle' : undefined),
@@ -142,6 +143,18 @@ export const AuxilioEmergencialSection = ({ auxilios }: AuxilioEmergencialSectio
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
+            {onEdit && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={onEdit}
+                className="h-8 w-8"
+                title="Editar dados da seção"
+              >
+                <Pencil className="h-4 w-4" />
+              </Button>
+            )}
+
             {hasData && (
               <Button
                 variant="ghost"
