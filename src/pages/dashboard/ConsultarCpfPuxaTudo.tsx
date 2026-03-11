@@ -948,43 +948,6 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
     };
   };
 
-  const renderAdminSectionHeader = (
-    title: string,
-    count: number,
-    onEdit: () => void,
-  ) => {
-    if (!isSupportOrAdmin) return null;
-
-    return (
-      <div className="mb-2 flex items-center justify-between gap-2 rounded-md border border-border bg-card p-2">
-        <span className="text-sm font-semibold text-foreground">{title}</span>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onEdit}
-            className="h-8 w-8"
-            title="Editar dados da seção"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <div className="relative inline-flex">
-            <Badge variant="secondary" className="uppercase tracking-wide">
-              Online
-            </Badge>
-            {count > 0 ? (
-              <span
-                className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                aria-label={`Quantidade de registros ${title}: ${count}`}
-              >
-                {count}
-              </span>
-            ) : null}
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   const openEditModal = async (section: EditableSection) => {
     if (!result?.id) return;
@@ -4187,21 +4150,21 @@ Todos os direitos reservados.`;
 
           {showTelefonesSection && (
             <div id="telefones-section" className={telefonesCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('Telefones', telefonesCount, () => openEditModal('telefones'))}
+              
               <TelefonesSection key={`telefones-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setTelefonesCount} />
             </div>
           )}
 
           {showEmailsSection && (
             <div id="emails-section" className={emailsCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('Emails', emailsCount, () => openEditModal('emails'))}
+              
               <EmailsSection key={`emails-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEmailsCount} />
             </div>
           )}
 
           {showEnderecosSection && (
             <div id="enderecos-section" className={enderecosCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('Endereços', enderecosCount, () => openEditModal('enderecos'))}
+              
               <EnderecosSection key={`enderecos-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEnderecosCount} />
             </div>
           )}
@@ -4297,7 +4260,7 @@ Todos os direitos reservados.`;
           {/* Parentes */}
           {!isRestrictToBasicAndCertidao && showParentesSection && (
             <div id="parentes-section" className={parentesCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('Parentes', parentesCount, () => openEditModal('parentes'))}
+              
               <ParentesSection key={`parentes-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setParentesCount} />
             </div>
           )}
@@ -4319,7 +4282,7 @@ Todos os direitos reservados.`;
           {/* CNS */}
           {(!isSlimMode || isExclusiveMode) && showCnsSection && (
             <div id="cns-section" className={cnsCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('CNS', cnsCount, () => openEditModal('cns'))}
+              
               <CnsSection key={`cns-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setCnsCount} />
             </div>
           )}
@@ -4327,7 +4290,7 @@ Todos os direitos reservados.`;
           {/* PIS */}
           {(!isSlimMode || isExclusiveMode) && showPisSection && pisCount > 0 && (
             <div id="pis-section">
-              {renderAdminSectionHeader('PIS', pisCount, () => openEditModal('pis'))}
+              
               <PisSection pis={result.pis} />
             </div>
           )}
@@ -4335,7 +4298,7 @@ Todos os direitos reservados.`;
           {/* Vacinas */}
           {(!isSlimMode || isExclusiveMode) && showVacinasSection && (
             <div id="vacinas-section" className={vacinasCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('Vacinas', vacinasCount, () => openEditModal('vacinas'))}
+              
               <VacinaDisplay key={`vacinas-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVacinasCount} />
             </div>
           )}
@@ -4364,7 +4327,7 @@ Todos os direitos reservados.`;
           {/* Auxílio Emergencial */}
           {(!isSlimMode || isExclusiveMode) && showAuxilioEmergencialSection && (auxiliosEmergenciais?.length ?? 0) > 0 && (
             <div id="auxilio-emergencial-section">
-              {renderAdminSectionHeader('Auxílio Emergencial', auxiliosEmergenciais?.length ?? 0, () => openEditModal('auxilioEmergencial'))}
+              
               <AuxilioEmergencialSection auxilios={auxiliosEmergenciais} />
             </div>
           )}
@@ -4391,7 +4354,7 @@ Todos os direitos reservados.`;
               </div>
 
               <div id="vivo-section" className={vivoCount === 0 ? 'hidden' : ''}>
-                {renderAdminSectionHeader('Operadora Vivo', vivoCount, () => openEditModal('operadoraVivo'))}
+                
                 <VivoSection key={`vivo-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVivoCount} />
               </div>
 
