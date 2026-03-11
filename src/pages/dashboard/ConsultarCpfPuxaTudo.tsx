@@ -948,43 +948,6 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
     };
   };
 
-  const renderAdminSectionHeader = (
-    title: string,
-    count: number,
-    onEdit: () => void,
-  ) => {
-    if (!isSupportOrAdmin) return null;
-
-    return (
-      <div className="mb-2 flex items-center justify-between gap-2 rounded-md border border-border bg-card p-2">
-        <span className="text-sm font-semibold text-foreground">{title}</span>
-        <div className="flex items-center gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onEdit}
-            className="h-8 w-8"
-            title="Editar dados da seção"
-          >
-            <Pencil className="h-4 w-4" />
-          </Button>
-          <div className="relative inline-flex">
-            <Badge variant="secondary" className="uppercase tracking-wide">
-              Online
-            </Badge>
-            {count > 0 ? (
-              <span
-                className="absolute -top-2 -right-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-destructive px-1 text-[10px] font-semibold leading-none text-destructive-foreground ring-1 ring-background"
-                aria-label={`Quantidade de registros ${title}: ${count}`}
-              >
-                {count}
-              </span>
-            ) : null}
-          </div>
-        </div>
-      </div>
-    );
-  };
 
   const openEditModal = async (section: EditableSection) => {
     if (!result?.id) return;
