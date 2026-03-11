@@ -1142,18 +1142,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
     setSavingAddAuxilio(true);
 
     try {
-      let cpfId = result.id;
-
-      if (!cpfId && result.cpf) {
-        const lookup = await baseCpfService.getByCpf(String(result.cpf).replace(/\D/g, ''));
-        if (lookup.success && lookup.data?.id) {
-          cpfId = lookup.data.id;
-        }
-      }
-
-      if (!cpfId) {
-        throw new Error('Não foi possível identificar o CPF para criar o registro.');
-      }
+      let cpfId = await resolveCurrentCpfId();
 
       const createResponse = await baseAuxilioEmergencialService.create({
         cpf_id: cpfId,
