@@ -1056,9 +1056,11 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
         }
 
         if (editModalConfig.section === 'dadosBasicos') {
+          const normalizedCpf = (editFormData.cpf ?? '').replace(/\D/g, '').trim();
+
           return {
             ...prev,
-            cpf: editFormData.cpf ?? '',
+            cpf: normalizedCpf || prev.cpf || '',
             nome: editFormData.nome ?? '',
             data_nascimento: editFormData.data_nascimento ?? '',
             sexo: editFormData.sexo ?? '',
