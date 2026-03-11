@@ -4298,7 +4298,7 @@ Todos os direitos reservados.`;
           {/* Vacinas */}
           {(!isSlimMode || isExclusiveMode) && showVacinasSection && (
             <div id="vacinas-section" className={vacinasCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('Vacinas', vacinasCount, () => openEditModal('vacinas'))}
+              
               <VacinaDisplay key={`vacinas-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVacinasCount} />
             </div>
           )}
