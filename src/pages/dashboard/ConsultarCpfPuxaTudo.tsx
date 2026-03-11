@@ -3593,6 +3593,17 @@ Todos os direitos reservados.`;
                     <span className="truncate">Dados Básicos</span>
                   </CardTitle>
                   <div className="flex items-center gap-2 flex-shrink-0">
+                    {isSupportOrAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => openEditModal('dadosBasicos')}
+                        className="h-8 w-8"
+                        title="Editar dados da seção"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
