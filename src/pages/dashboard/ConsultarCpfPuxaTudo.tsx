@@ -3499,6 +3499,17 @@ Todos os direitos reservados.`;
                   Dados Financeiros
                 </CardTitle>
                 <div className="flex items-center gap-2">
+                  {isSupportOrAdmin && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openEditModal('dadosFinanceiros')}
+                      className="h-8 w-8"
+                      title="Editar dados da seção"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
