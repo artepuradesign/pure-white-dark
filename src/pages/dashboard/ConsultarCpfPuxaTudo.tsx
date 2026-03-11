@@ -4351,7 +4351,13 @@ Todos os direitos reservados.`;
           {/* Auxílio Emergencial */}
           {(!isSlimMode || isExclusiveMode) && showAuxilioEmergencialSection && (auxiliosEmergenciais?.length ?? 0) > 0 && (
             <div id="auxilio-emergencial-section">
-              
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('auxilioEmergencial')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
               <AuxilioEmergencialSection auxilios={auxiliosEmergenciais} />
             </div>
           )}
