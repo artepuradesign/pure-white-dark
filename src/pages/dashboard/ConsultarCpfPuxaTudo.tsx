@@ -9,7 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Progress } from '@/components/ui/progress';
 import { 
   User, Search, AlertCircle, CheckCircle, Download, Settings, Crown, FileText, 
-  Camera, DollarSign, TrendingUp, Award, Shield, Target, AlertTriangle, Info, Copy, Phone, ShoppingCart, Wallet
+  Camera, DollarSign, TrendingUp, Award, Shield, Target, AlertTriangle, Info, Copy, Phone, ShoppingCart, Wallet, Pencil
 } from 'lucide-react';
 import PixQRCodeModal from '@/components/payment/PixQRCodeModal';
 import { usePixPaymentFlow } from '@/hooks/usePixPaymentFlow';
@@ -594,6 +594,13 @@ interface CPFResult {
   cloud_email?: any[];
 }
 
+type EditableSection = 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor';
+
+interface EditModalConfig {
+  section: EditableSection;
+  title: string;
+}
+
 export interface ConsultarCpfPuxaTudoProps {
   /** ID do módulo cadastrado no banco (usado para preço/título e metadata.module_id) */
   moduleId?: number;
@@ -812,6 +819,12 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
   const isMobile = useIsMobile();
   const resultRef = useRef<HTMLDivElement>(null);
   const { user } = useAuth();
+  const isSupportOrAdmin = ['admin', 'suporte'].includes(
+    String((user as any)?.user_role ?? '').toLowerCase()
+  );
+
+  const [editModalConfig, setEditModalConfig] = useState<EditModalConfig | null>(null);
+  const [editFormData, setEditFormData] = useState<Record<string, string>>({});
 
   // Carregar título/descrição do módulo (do cadastro)
   useEffect(() => {
@@ -922,6 +935,101 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
                   score >= 600 ? 'Score bom, boas chances de aprovação' :
                   score >= 400 ? 'Score regular, pode melhorar' : 'Score baixo, precisa de atenção'
     };
+  };
+
+  const openEditModal = (section: EditableSection) => {
+    if (!result) return;
+
+    if (section === 'dadosFinanceiros') {
+      setEditFormData({
+        poder_aquisitivo: String(result.poder_aquisitivo ?? ''),
+        renda: String(result.renda ?? ''),
+        fx_poder_aquisitivo: String(result.fx_poder_aquisitivo ?? ''),
+      });
+      setEditModalConfig({ section, title: 'Editar Dados Financeiros' });
+      return;
+    }
+
+    if (section === 'dadosBasicos') {
+      setEditFormData({
+        cpf: String(result.cpf ?? ''),
+        nome: String(result.nome ?? ''),
+        data_nascimento: String(result.data_nascimento ?? ''),
+        sexo: String(result.sexo ?? ''),
+        mae: String((result.mae || result.nome_mae) ?? ''),
+        pai: String((result.pai || result.nome_pai) ?? ''),
+        estado_civil: String(result.estado_civil ?? ''),
+        rg: String(result.rg ?? ''),
+        cbo: String(result.cbo ?? ''),
+        orgao_emissor: String(result.orgao_emissor ?? ''),
+        uf_emissao: String(result.uf_emissao ?? ''),
+        data_obito: String(result.data_obito ?? ''),
+        renda: String(result.renda ?? ''),
+        titulo_eleitor: String(result.titulo_eleitor ?? ''),
+      });
+      setEditModalConfig({ section, title: 'Editar Dados Básicos' });
+      return;
+    }
+
+    setEditFormData({
+      titulo_eleitor: String(result.titulo_eleitor ?? ''),
+      zona: String(result.zona ?? ''),
+      secao: String(result.secao ?? ''),
+    });
+    setEditModalConfig({ section, title: 'Editar Título de Eleitor' });
+  };
+
+  const handleEditFieldChange = (field: string, value: string) => {
+    setEditFormData((prev) => ({ ...prev, [field]: value }));
+  };
+
+  const handleSaveEditedSection = () => {
+    if (!editModalConfig) return;
+
+    setResult((prev) => {
+      if (!prev) return prev;
+
+      if (editModalConfig.section === 'dadosFinanceiros') {
+        return {
+          ...prev,
+          poder_aquisitivo: editFormData.poder_aquisitivo ?? '',
+          renda: editFormData.renda ?? '',
+          fx_poder_aquisitivo: editFormData.fx_poder_aquisitivo ?? '',
+        };
+      }
+
+      if (editModalConfig.section === 'dadosBasicos') {
+        return {
+          ...prev,
+          cpf: editFormData.cpf ?? '',
+          nome: editFormData.nome ?? '',
+          data_nascimento: editFormData.data_nascimento ?? '',
+          sexo: editFormData.sexo ?? '',
+          mae: editFormData.mae ?? '',
+          nome_mae: editFormData.mae ?? '',
+          pai: editFormData.pai ?? '',
+          nome_pai: editFormData.pai ?? '',
+          estado_civil: editFormData.estado_civil ?? '',
+          rg: editFormData.rg ?? '',
+          cbo: editFormData.cbo ?? '',
+          orgao_emissor: editFormData.orgao_emissor ?? '',
+          uf_emissao: editFormData.uf_emissao ?? '',
+          data_obito: editFormData.data_obito ?? '',
+          renda: editFormData.renda ?? '',
+          titulo_eleitor: editFormData.titulo_eleitor ?? '',
+        };
+      }
+
+      return {
+        ...prev,
+        titulo_eleitor: editFormData.titulo_eleitor ?? '',
+        zona: editFormData.zona ?? '',
+        secao: editFormData.secao ?? '',
+      };
+    });
+
+    toast.success('Dados atualizados na tela!');
+    setEditModalConfig(null);
   };
 
   // Carregar últimas 5 consultas CPF para exibir na seção de histórico
@@ -3391,6 +3499,17 @@ Todos os direitos reservados.`;
                   Dados Financeiros
                 </CardTitle>
                 <div className="flex items-center gap-2">
+                  {isSupportOrAdmin && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openEditModal('dadosFinanceiros')}
+                      className="h-8 w-8"
+                      title="Editar dados da seção"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
@@ -3474,6 +3593,17 @@ Todos os direitos reservados.`;
                     <span className="truncate">Dados Básicos</span>
                   </CardTitle>
                   <div className="flex items-center gap-2 flex-shrink-0">
+                    {isSupportOrAdmin && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => openEditModal('dadosBasicos')}
+                        className="h-8 w-8"
+                        title="Editar dados da seção"
+                      >
+                        <Pencil className="h-4 w-4" />
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="icon"
@@ -3720,6 +3850,17 @@ Todos os direitos reservados.`;
                   Título de Eleitor
                 </CardTitle>
                 <div className="flex items-center gap-2 flex-shrink-0">
+                  {isSupportOrAdmin && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => openEditModal('tituloEleitor')}
+                      className="h-8 w-8"
+                      title="Editar dados da seção"
+                    >
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="icon"
@@ -4168,6 +4309,112 @@ Todos os direitos reservados.`;
           </CardContent>
         </Card>
       </div>
+
+      <Dialog open={!!editModalConfig} onOpenChange={(open) => !open && setEditModalConfig(null)}>
+        <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{editModalConfig?.title || 'Editar dados da seção'}</DialogTitle>
+            <DialogDescription>
+              Atualize os campos abaixo para refletir as alterações diretamente na tela.
+            </DialogDescription>
+          </DialogHeader>
+
+          {editModalConfig?.section === 'dadosFinanceiros' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="edit-poder-aquisitivo">Poder Aquisitivo</Label>
+                <Input
+                  id="edit-poder-aquisitivo"
+                  value={editFormData.poder_aquisitivo ?? ''}
+                  onChange={(e) => handleEditFieldChange('poder_aquisitivo', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-renda-financeira">Renda</Label>
+                <Input
+                  id="edit-renda-financeira"
+                  value={editFormData.renda ?? ''}
+                  onChange={(e) => handleEditFieldChange('renda', e.target.value)}
+                />
+              </div>
+              <div className="md:col-span-2">
+                <Label htmlFor="edit-faixa-poder">Faixa Poder Aquisitivo</Label>
+                <Input
+                  id="edit-faixa-poder"
+                  value={editFormData.fx_poder_aquisitivo ?? ''}
+                  onChange={(e) => handleEditFieldChange('fx_poder_aquisitivo', e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'dadosBasicos' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {[
+                { key: 'cpf', label: 'CPF' },
+                { key: 'nome', label: 'Nome' },
+                { key: 'data_nascimento', label: 'Data de Nascimento' },
+                { key: 'sexo', label: 'Sexo' },
+                { key: 'mae', label: 'Nome da Mãe' },
+                { key: 'pai', label: 'Nome do Pai' },
+                { key: 'estado_civil', label: 'Estado Civil' },
+                { key: 'rg', label: 'RG' },
+                { key: 'cbo', label: 'CBO' },
+                { key: 'orgao_emissor', label: 'Órgão Emissor' },
+                { key: 'uf_emissao', label: 'UF Emissão' },
+                { key: 'data_obito', label: 'Data Óbito' },
+                { key: 'renda', label: 'Renda' },
+                { key: 'titulo_eleitor', label: 'Título de Eleitor' },
+              ].map((field) => (
+                <div key={field.key}>
+                  <Label htmlFor={`edit-${field.key}`}>{field.label}</Label>
+                  <Input
+                    id={`edit-${field.key}`}
+                    value={editFormData[field.key] ?? ''}
+                    onChange={(e) => handleEditFieldChange(field.key, e.target.value)}
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+
+          {editModalConfig?.section === 'tituloEleitor' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <Label htmlFor="edit-titulo-eleitor">Título de Eleitor</Label>
+                <Input
+                  id="edit-titulo-eleitor"
+                  value={editFormData.titulo_eleitor ?? ''}
+                  onChange={(e) => handleEditFieldChange('titulo_eleitor', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-zona">Zona</Label>
+                <Input
+                  id="edit-zona"
+                  value={editFormData.zona ?? ''}
+                  onChange={(e) => handleEditFieldChange('zona', e.target.value)}
+                />
+              </div>
+              <div>
+                <Label htmlFor="edit-secao">Seção</Label>
+                <Input
+                  id="edit-secao"
+                  value={editFormData.secao ?? ''}
+                  onChange={(e) => handleEditFieldChange('secao', e.target.value)}
+                />
+              </div>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-2 pt-2">
+            <Button variant="outline" onClick={() => setEditModalConfig(null)}>
+              Cancelar
+            </Button>
+            <Button onClick={handleSaveEditedSection}>Salvar</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       {/* Consultation Detail Dialog */}
       <ConsultationDetailDialog
