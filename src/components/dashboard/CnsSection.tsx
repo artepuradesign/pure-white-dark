@@ -15,8 +15,11 @@ interface CnsSectionProps {
   onCountChange?: (count: number) => void;
   onEdit?: () => void;
 }
-
-const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange, onEdit }) => {
+const tipoLabel = (t?: string | null) => {
+  if (t === 'D') return 'Definitivo';
+  if (t === 'P') return 'Provisório';
+  return '';
+};
   const { isLoading, error, getCnsByCpfId } = useBaseCns();
   const [items, setItems] = useState<BaseCns[]>([]);
 
