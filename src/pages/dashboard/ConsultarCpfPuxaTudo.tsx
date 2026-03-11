@@ -4150,7 +4150,7 @@ Todos os direitos reservados.`;
 
           {showTelefonesSection && (
             <div id="telefones-section" className={telefonesCount === 0 ? 'hidden' : ''}>
-              {renderAdminSectionHeader('Telefones', telefonesCount, () => openEditModal('telefones'))}
+              
               <TelefonesSection key={`telefones-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setTelefonesCount} />
             </div>
           )}
