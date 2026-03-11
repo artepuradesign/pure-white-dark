@@ -4396,7 +4396,8 @@ Todos os direitos reservados.`;
                 key={`emails-${sectionsRefreshKey}`}
                 cpfId={result.id}
                 onCountChange={setEmailsCount}
-                onEdit={isSupportOrAdmin ? () => openEditModal('emails') : undefined}
+                onAddRecord={isSupportOrAdmin ? () => openAddSectionModal('emails') : undefined}
+                onEditRecord={isSupportOrAdmin ? (record) => openEditModal('emails', record) : undefined}
               />
             </div>
           )}
