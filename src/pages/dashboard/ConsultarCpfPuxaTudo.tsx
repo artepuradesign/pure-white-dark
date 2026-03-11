@@ -594,6 +594,13 @@ interface CPFResult {
   cloud_email?: any[];
 }
 
+type EditableSection = 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor';
+
+interface EditModalConfig {
+  section: EditableSection;
+  title: string;
+}
+
 export interface ConsultarCpfPuxaTudoProps {
   /** ID do módulo cadastrado no banco (usado para preço/título e metadata.module_id) */
   moduleId?: number;
