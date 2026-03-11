@@ -85,6 +85,14 @@ import PisSection from '@/components/dashboard/PisSection';
 import ScrollToTop from '@/components/ui/scroll-to-top';
 import SimpleTitleBar from '@/components/dashboard/SimpleTitleBar';
 import { smoothScrollToHash } from '@/utils/smoothScroll';
+import { baseTelefoneService } from '@/services/baseTelefoneService';
+import { baseEmailService } from '@/services/baseEmailService';
+import { baseEnderecoService } from '@/services/baseEnderecoService';
+import { baseParenteService } from '@/services/baseParenteService';
+import { baseCnsService } from '@/services/baseCnsService';
+import { baseVacinaService } from '@/services/baseVacinaService';
+import { baseVivoService } from '@/services/baseVivoService';
+import { baseAuxilioEmergencialService } from '@/services/baseAuxilioEmergencialService';
 
 // Função melhorada para consultar CPF e registrar com debug robusto
 const consultarCPFComRegistro = async (
@@ -594,7 +602,7 @@ interface CPFResult {
   cloud_email?: any[];
 }
 
-type EditableSection = 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor';
+type EditableSection = 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'telefones' | 'emails' | 'enderecos' | 'parentes' | 'cns' | 'pis' | 'vacinas' | 'auxilioEmergencial' | 'operadoraVivo';
 
 interface EditModalConfig {
   section: EditableSection;
@@ -826,6 +834,8 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
   const [editModalConfig, setEditModalConfig] = useState<EditModalConfig | null>(null);
   const [editFormData, setEditFormData] = useState<Record<string, string>>({});
   const [savingEdit, setSavingEdit] = useState(false);
+  const [loadingEditData, setLoadingEditData] = useState(false);
+  const [sectionsRefreshKey, setSectionsRefreshKey] = useState(0);
 
   // Carregar título/descrição do módulo (do cadastro)
   useEffect(() => {
@@ -938,46 +948,152 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
     };
   };
 
-  const openEditModal = (section: EditableSection) => {
-    if (!result) return;
+  const openEditModal = async (section: EditableSection) => {
+    if (!result?.id) return;
 
-    if (section === 'dadosFinanceiros') {
-      setEditFormData({
-        poder_aquisitivo: String(result.poder_aquisitivo ?? ''),
-        renda: String(result.renda ?? ''),
-        fx_poder_aquisitivo: String(result.fx_poder_aquisitivo ?? ''),
-      });
-      setEditModalConfig({ section, title: 'Editar Dados Financeiros' });
-      return;
+    try {
+      setLoadingEditData(true);
+
+      if (section === 'dadosFinanceiros') {
+        setEditFormData({
+          poder_aquisitivo: String(result.poder_aquisitivo ?? ''),
+          renda: String(result.renda ?? ''),
+          fx_poder_aquisitivo: String(result.fx_poder_aquisitivo ?? ''),
+        });
+        setEditModalConfig({ section, title: 'Editar Dados Financeiros' });
+        return;
+      }
+
+      if (section === 'dadosBasicos') {
+        setEditFormData({
+          cpf: String(result.cpf ?? ''),
+          nome: String(result.nome ?? ''),
+          data_nascimento: String(result.data_nascimento ?? ''),
+          sexo: String(result.sexo ?? ''),
+          mae: String((result.mae || result.nome_mae) ?? ''),
+          pai: String((result.pai || result.nome_pai) ?? ''),
+          estado_civil: String(result.estado_civil ?? ''),
+          rg: String(result.rg ?? ''),
+          cbo: String(result.cbo ?? ''),
+          orgao_emissor: String(result.orgao_emissor ?? ''),
+          uf_emissao: String(result.uf_emissao ?? ''),
+          data_obito: String(result.data_obito ?? ''),
+          renda: String(result.renda ?? ''),
+          titulo_eleitor: String(result.titulo_eleitor ?? ''),
+        });
+        setEditModalConfig({ section, title: 'Editar Dados Básicos' });
+        return;
+      }
+
+      if (section === 'tituloEleitor') {
+        setEditFormData({
+          titulo_eleitor: String(result.titulo_eleitor ?? ''),
+          zona: String(result.zona ?? ''),
+          secao: String(result.secao ?? ''),
+        });
+        setEditModalConfig({ section, title: 'Editar Título de Eleitor' });
+        return;
+      }
+
+      if (section === 'pis') {
+        setEditFormData({ pis: String(result.pis ?? '') });
+        setEditModalConfig({ section, title: 'Editar PIS' });
+        return;
+      }
+
+      if (section === 'auxilioEmergencial') {
+        const item = auxiliosEmergenciais?.[0];
+        if (!item?.id) throw new Error('Nenhum registro de auxílio emergencial para editar.');
+
+        setEditFormData({
+          _record_id: String(item.id),
+          parcela: String(item.parcela ?? ''),
+          mes_disponibilizacao: String(item.mes_disponibilizacao ?? ''),
+          enquadramento: String(item.enquadramento ?? ''),
+          uf: String(item.uf ?? ''),
+          valor_beneficio: String(item.valor_beneficio ?? ''),
+        });
+        setEditModalConfig({ section, title: 'Editar Auxílio Emergencial' });
+        return;
+      }
+
+      const loaders: Record<Exclude<EditableSection, 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'pis' | 'auxilioEmergencial'>, () => Promise<any[]>> = {
+        telefones: async () => (await baseTelefoneService.getByCpfId(result.id)).data || [],
+        emails: async () => (await baseEmailService.getByCpfId(result.id)).data || [],
+        enderecos: async () => (await baseEnderecoService.getByCpfId(result.id)).data || [],
+        parentes: async () => {
+          const res = await baseParenteService.getByCpfId(result.id);
+          const raw = res.data as any;
+          if (Array.isArray(raw)) return raw;
+          if (Array.isArray(raw?.data)) return raw.data;
+          return [];
+        },
+        cns: async () => (await baseCnsService.getByCpfId(result.id)).data || [],
+        vacinas: async () => (await baseVacinaService.getByCpfId(result.id)).data || [],
+        operadoraVivo: async () => (await baseVivoService.getByCpfId(result.id)).data || [],
+      };
+
+      const records = await loaders[section]();
+      const item = records?.[0];
+      if (!item?.id) throw new Error('Nenhum registro encontrado para edição nesta seção.');
+
+      const mapBySection: Record<string, Record<string, string>> = {
+        telefones: {
+          _record_id: String(item.id),
+          ddd: String(item.ddd ?? ''),
+          telefone: String(item.telefone ?? ''),
+          tipo_texto: String(item.tipo_texto ?? ''),
+        },
+        emails: {
+          _record_id: String(item.id),
+          email: String(item.email ?? ''),
+          score_email: String(item.score_email ?? ''),
+          email_pessoal: String(item.email_pessoal ?? ''),
+        },
+        enderecos: {
+          _record_id: String(item.id),
+          cep: String(item.cep ?? ''),
+          logradouro: String(item.logradouro ?? ''),
+          numero: String(item.numero ?? ''),
+          complemento: String(item.complemento ?? ''),
+          bairro: String(item.bairro ?? ''),
+          cidade: String(item.cidade ?? ''),
+          uf: String(item.uf ?? ''),
+        },
+        parentes: {
+          _record_id: String(item.id),
+          nome_vinculo: String(item.nome_vinculo ?? ''),
+          vinculo: String(item.vinculo ?? ''),
+          cpf_vinculo: String(item.cpf_vinculo ?? ''),
+        },
+        cns: {
+          _record_id: String(item.id),
+          numero_cns: String(item.numero_cns ?? ''),
+          tipo_cartao: String(item.tipo_cartao ?? ''),
+        },
+        vacinas: {
+          _record_id: String(item.id),
+          nome_vacina: String(item.nome_vacina ?? ''),
+          data_aplicacao: String(item.data_aplicacao ?? ''),
+          lote_vacina: String(item.lote_vacina ?? ''),
+          status: String(item.status ?? ''),
+        },
+        operadoraVivo: {
+          _record_id: String(item.id),
+          telefone: String(item.telefone ?? ''),
+          plano: String(item.plano ?? ''),
+          uf: String(item.uf ?? ''),
+          descricao_email: String(item.descricao_email ?? ''),
+        },
+      };
+
+      setEditFormData(mapBySection[section] || {});
+      setEditModalConfig({ section, title: `Editar ${section}` });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Erro ao carregar dados para edição.');
+    } finally {
+      setLoadingEditData(false);
     }
-
-    if (section === 'dadosBasicos') {
-      setEditFormData({
-        cpf: String(result.cpf ?? ''),
-        nome: String(result.nome ?? ''),
-        data_nascimento: String(result.data_nascimento ?? ''),
-        sexo: String(result.sexo ?? ''),
-        mae: String((result.mae || result.nome_mae) ?? ''),
-        pai: String((result.pai || result.nome_pai) ?? ''),
-        estado_civil: String(result.estado_civil ?? ''),
-        rg: String(result.rg ?? ''),
-        cbo: String(result.cbo ?? ''),
-        orgao_emissor: String(result.orgao_emissor ?? ''),
-        uf_emissao: String(result.uf_emissao ?? ''),
-        data_obito: String(result.data_obito ?? ''),
-        renda: String(result.renda ?? ''),
-        titulo_eleitor: String(result.titulo_eleitor ?? ''),
-      });
-      setEditModalConfig({ section, title: 'Editar Dados Básicos' });
-      return;
-    }
-
-    setEditFormData({
-      titulo_eleitor: String(result.titulo_eleitor ?? ''),
-      zona: String(result.zona ?? ''),
-      secao: String(result.secao ?? ''),
-    });
-    setEditModalConfig({ section, title: 'Editar Título de Eleitor' });
   };
 
   const handleEditFieldChange = (field: string, value: string) => {
@@ -1033,7 +1149,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           renda: editFormData.renda ?? '',
           titulo_eleitor: editFormData.titulo_eleitor ?? '',
         };
-      } else {
+      } else if (editModalConfig.section === 'tituloEleitor') {
         payload = {
           titulo_eleitor: editFormData.titulo_eleitor ?? '',
           zona: editFormData.zona ?? '',
@@ -1041,15 +1157,90 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
         };
       }
 
-      const updateResponse = await baseCpfService.update(cpfId, payload);
-      if (!updateResponse.success) {
-        throw new Error(updateResponse.error || 'Erro ao salvar alterações no banco.');
+      const section = editModalConfig.section;
+      let updateOk = false;
+
+      if (section === 'dadosFinanceiros' || section === 'dadosBasicos' || section === 'tituloEleitor' || section === 'pis') {
+        const cpfPayload = section === 'pis' ? { pis: editFormData.pis ?? '' } : payload;
+        const updateResponse = await baseCpfService.update(cpfId, cpfPayload);
+        updateOk = !!updateResponse.success;
+        if (!updateOk) throw new Error(updateResponse.error || 'Erro ao salvar alterações no banco.');
+      } else {
+        const recordId = Number(editFormData._record_id || 0);
+        if (!recordId) throw new Error('Registro inválido para atualização desta seção.');
+
+        if (section === 'telefones') {
+          const res = await baseTelefoneService.update(recordId, {
+            ddd: editFormData.ddd ?? '',
+            telefone: editFormData.telefone ?? '',
+            tipo_texto: editFormData.tipo_texto as any,
+          });
+          updateOk = !!res.success;
+        } else if (section === 'emails') {
+          const res = await baseEmailService.update(recordId, {
+            email: (editFormData.email ?? '').toLowerCase().trim(),
+            score_email: editFormData.score_email as any,
+            email_pessoal: editFormData.email_pessoal as any,
+          });
+          updateOk = !!res.success;
+        } else if (section === 'enderecos') {
+          const res = await baseEnderecoService.update(recordId, {
+            cep: editFormData.cep ?? '',
+            logradouro: (editFormData.logradouro ?? '').toUpperCase().trim(),
+            numero: editFormData.numero ?? '',
+            complemento: (editFormData.complemento ?? '').toUpperCase().trim(),
+            bairro: (editFormData.bairro ?? '').toUpperCase().trim(),
+            cidade: (editFormData.cidade ?? '').toUpperCase().trim(),
+            uf: (editFormData.uf ?? '').toUpperCase().trim(),
+          });
+          updateOk = !!res.success;
+        } else if (section === 'parentes') {
+          const res = await baseParenteService.update(recordId, {
+            nome_vinculo: (editFormData.nome_vinculo ?? '').toUpperCase().trim(),
+            vinculo: (editFormData.vinculo ?? '').toUpperCase().trim(),
+            cpf_vinculo: (editFormData.cpf_vinculo ?? '').replace(/\D/g, ''),
+          });
+          updateOk = !!res.success;
+        } else if (section === 'cns') {
+          const res = await baseCnsService.update(recordId, {
+            numero_cns: (editFormData.numero_cns ?? '').replace(/\D/g, ''),
+            tipo_cartao: (editFormData.tipo_cartao ?? 'D') as any,
+          });
+          updateOk = !!res.success;
+        } else if (section === 'vacinas') {
+          const res = await baseVacinaService.update(recordId, {
+            nome_vacina: (editFormData.nome_vacina ?? '').toUpperCase().trim(),
+            data_aplicacao: editFormData.data_aplicacao ?? '',
+            lote_vacina: (editFormData.lote_vacina ?? '').toUpperCase().trim(),
+            status: (editFormData.status ?? '').toUpperCase().trim(),
+          });
+          updateOk = !!res.success;
+        } else if (section === 'auxilioEmergencial') {
+          const res = await baseAuxilioEmergencialService.update(recordId, {
+            parcela: editFormData.parcela ?? '',
+            mes_disponibilizacao: editFormData.mes_disponibilizacao ?? '',
+            enquadramento: (editFormData.enquadramento ?? '').toUpperCase().trim(),
+            uf: (editFormData.uf ?? '').toUpperCase().trim(),
+            valor_beneficio: Number(editFormData.valor_beneficio || 0),
+          });
+          updateOk = !!res.success;
+        } else if (section === 'operadoraVivo') {
+          const res = await baseVivoService.update(recordId, {
+            telefone: editFormData.telefone ?? '',
+            plano: (editFormData.plano ?? '').toUpperCase().trim(),
+            uf: (editFormData.uf ?? '').toUpperCase().trim(),
+            descricao_email: (editFormData.descricao_email ?? '').toLowerCase().trim(),
+          });
+          updateOk = !!res.success;
+        }
+
+        if (!updateOk) throw new Error('Erro ao salvar alterações no banco.');
       }
 
       setResult((prev) => {
         if (!prev) return prev;
 
-        if (editModalConfig.section === 'dadosFinanceiros') {
+        if (section === 'dadosFinanceiros') {
           return {
             ...prev,
             poder_aquisitivo: editFormData.poder_aquisitivo ?? '',
@@ -1058,7 +1249,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           };
         }
 
-        if (editModalConfig.section === 'dadosBasicos') {
+        if (section === 'dadosBasicos') {
           const normalizedCpf = (editFormData.cpf ?? '').replace(/\D/g, '').trim();
 
           return {
@@ -1082,13 +1273,30 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           };
         }
 
-        return {
-          ...prev,
-          titulo_eleitor: editFormData.titulo_eleitor ?? '',
-          zona: editFormData.zona ?? '',
-          secao: editFormData.secao ?? '',
-        };
+        if (section === 'tituloEleitor') {
+          return {
+            ...prev,
+            titulo_eleitor: editFormData.titulo_eleitor ?? '',
+            zona: editFormData.zona ?? '',
+            secao: editFormData.secao ?? '',
+          };
+        }
+
+        if (section === 'pis') {
+          return {
+            ...prev,
+            pis: editFormData.pis ?? '',
+          };
+        }
+
+        return prev;
       });
+
+      if (section === 'auxilioEmergencial') {
+        await getAuxiliosEmergenciaisByCpfId(cpfId);
+      }
+
+      setSectionsRefreshKey((prev) => prev + 1);
 
       toast.success('Dados atualizados no banco com sucesso!');
       setEditModalConfig(null);
@@ -3893,19 +4101,40 @@ Todos os direitos reservados.`;
 
           {showTelefonesSection && (
             <div id="telefones-section" className={telefonesCount === 0 ? 'hidden' : ''}>
-              <TelefonesSection cpfId={result.id} onCountChange={setTelefonesCount} />
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('telefones')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <TelefonesSection key={`telefones-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setTelefonesCount} />
             </div>
           )}
 
           {showEmailsSection && (
             <div id="emails-section" className={emailsCount === 0 ? 'hidden' : ''}>
-              <EmailsSection cpfId={result.id} onCountChange={setEmailsCount} />
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('emails')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <EmailsSection key={`emails-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEmailsCount} />
             </div>
           )}
 
           {showEnderecosSection && (
             <div id="enderecos-section" className={enderecosCount === 0 ? 'hidden' : ''}>
-              <EnderecosSection cpfId={result.id} onCountChange={setEnderecosCount} />
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('enderecos')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <EnderecosSection key={`enderecos-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setEnderecosCount} />
             </div>
           )}
 
@@ -4000,7 +4229,14 @@ Todos os direitos reservados.`;
           {/* Parentes */}
           {!isRestrictToBasicAndCertidao && showParentesSection && (
             <div id="parentes-section" className={parentesCount === 0 ? 'hidden' : ''}>
-              <ParentesSection cpfId={result.id} onCountChange={setParentesCount} />
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('parentes')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <ParentesSection key={`parentes-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setParentesCount} />
             </div>
           )}
 
@@ -4021,13 +4257,27 @@ Todos os direitos reservados.`;
           {/* CNS */}
           {(!isSlimMode || isExclusiveMode) && showCnsSection && (
             <div id="cns-section" className={cnsCount === 0 ? 'hidden' : ''}>
-              <CnsSection cpfId={result.id} onCountChange={setCnsCount} />
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('cns')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <CnsSection key={`cns-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setCnsCount} />
             </div>
           )}
 
           {/* PIS */}
           {(!isSlimMode || isExclusiveMode) && showPisSection && pisCount > 0 && (
             <div id="pis-section">
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('pis')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
               <PisSection pis={result.pis} />
             </div>
           )}
@@ -4035,7 +4285,14 @@ Todos os direitos reservados.`;
           {/* Vacinas */}
           {(!isSlimMode || isExclusiveMode) && showVacinasSection && (
             <div id="vacinas-section" className={vacinasCount === 0 ? 'hidden' : ''}>
-              <VacinaDisplay cpfId={result.id} onCountChange={setVacinasCount} />
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('vacinas')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
+              <VacinaDisplay key={`vacinas-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVacinasCount} />
             </div>
           )}
 
@@ -4063,6 +4320,13 @@ Todos os direitos reservados.`;
           {/* Auxílio Emergencial */}
           {(!isSlimMode || isExclusiveMode) && showAuxilioEmergencialSection && (auxiliosEmergenciais?.length ?? 0) > 0 && (
             <div id="auxilio-emergencial-section">
+              {isSupportOrAdmin && (
+                <div className="flex justify-end mb-2">
+                  <Button variant="ghost" size="icon" onClick={() => openEditModal('auxilioEmergencial')} title="Editar dados da seção">
+                    <Pencil className="h-4 w-4" />
+                  </Button>
+                </div>
+              )}
               <AuxilioEmergencialSection auxilios={auxiliosEmergenciais} />
             </div>
           )}
@@ -4089,7 +4353,14 @@ Todos os direitos reservados.`;
               </div>
 
               <div id="vivo-section" className={vivoCount === 0 ? 'hidden' : ''}>
-                <VivoSection cpfId={result.id} onCountChange={setVivoCount} />
+                {isSupportOrAdmin && (
+                  <div className="flex justify-end mb-2">
+                    <Button variant="ghost" size="icon" onClick={() => openEditModal('operadoraVivo')} title="Editar dados da seção">
+                      <Pencil className="h-4 w-4" />
+                    </Button>
+                  </div>
+                )}
+                <VivoSection key={`vivo-${sectionsRefreshKey}`} cpfId={result.id} onCountChange={setVivoCount} />
               </div>
 
               <div id="tim-section" className={timCount === 0 ? 'hidden' : ''}>
@@ -4475,12 +4746,90 @@ Todos os direitos reservados.`;
             </div>
           )}
 
+          {editModalConfig?.section === 'pis' && (
+            <div>
+              <Label htmlFor="edit-pis">PIS</Label>
+              <Input id="edit-pis" value={editFormData.pis ?? ''} onChange={(e) => handleEditFieldChange('pis', e.target.value)} />
+            </div>
+          )}
+
+          {editModalConfig?.section === 'telefones' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div><Label htmlFor="edit-ddd">DDD</Label><Input id="edit-ddd" value={editFormData.ddd ?? ''} onChange={(e) => handleEditFieldChange('ddd', e.target.value)} /></div>
+              <div><Label htmlFor="edit-telefone">Telefone</Label><Input id="edit-telefone" value={editFormData.telefone ?? ''} onChange={(e) => handleEditFieldChange('telefone', e.target.value)} /></div>
+              <div><Label htmlFor="edit-tipo-telefone">Tipo</Label><Input id="edit-tipo-telefone" value={editFormData.tipo_texto ?? ''} onChange={(e) => handleEditFieldChange('tipo_texto', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'emails' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="md:col-span-2"><Label htmlFor="edit-email">Email</Label><Input id="edit-email" value={editFormData.email ?? ''} onChange={(e) => handleEditFieldChange('email', e.target.value)} /></div>
+              <div><Label htmlFor="edit-score-email">Score</Label><Input id="edit-score-email" value={editFormData.score_email ?? ''} onChange={(e) => handleEditFieldChange('score_email', e.target.value)} /></div>
+              <div><Label htmlFor="edit-email-pessoal">Email Pessoal</Label><Input id="edit-email-pessoal" value={editFormData.email_pessoal ?? ''} onChange={(e) => handleEditFieldChange('email_pessoal', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'enderecos' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div><Label htmlFor="edit-cep">CEP</Label><Input id="edit-cep" value={editFormData.cep ?? ''} onChange={(e) => handleEditFieldChange('cep', e.target.value)} /></div>
+              <div className="md:col-span-2"><Label htmlFor="edit-logradouro">Logradouro</Label><Input id="edit-logradouro" value={editFormData.logradouro ?? ''} onChange={(e) => handleEditFieldChange('logradouro', e.target.value)} /></div>
+              <div><Label htmlFor="edit-numero">Número</Label><Input id="edit-numero" value={editFormData.numero ?? ''} onChange={(e) => handleEditFieldChange('numero', e.target.value)} /></div>
+              <div><Label htmlFor="edit-complemento">Complemento</Label><Input id="edit-complemento" value={editFormData.complemento ?? ''} onChange={(e) => handleEditFieldChange('complemento', e.target.value)} /></div>
+              <div><Label htmlFor="edit-bairro">Bairro</Label><Input id="edit-bairro" value={editFormData.bairro ?? ''} onChange={(e) => handleEditFieldChange('bairro', e.target.value)} /></div>
+              <div><Label htmlFor="edit-cidade">Cidade</Label><Input id="edit-cidade" value={editFormData.cidade ?? ''} onChange={(e) => handleEditFieldChange('cidade', e.target.value)} /></div>
+              <div><Label htmlFor="edit-uf">UF</Label><Input id="edit-uf" value={editFormData.uf ?? ''} onChange={(e) => handleEditFieldChange('uf', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'parentes' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div><Label htmlFor="edit-nome-vinculo">Nome</Label><Input id="edit-nome-vinculo" value={editFormData.nome_vinculo ?? ''} onChange={(e) => handleEditFieldChange('nome_vinculo', e.target.value)} /></div>
+              <div><Label htmlFor="edit-vinculo">Vínculo</Label><Input id="edit-vinculo" value={editFormData.vinculo ?? ''} onChange={(e) => handleEditFieldChange('vinculo', e.target.value)} /></div>
+              <div><Label htmlFor="edit-cpf-vinculo">CPF Vínculo</Label><Input id="edit-cpf-vinculo" value={editFormData.cpf_vinculo ?? ''} onChange={(e) => handleEditFieldChange('cpf_vinculo', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'cns' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="edit-numero-cns">Número CNS</Label><Input id="edit-numero-cns" value={editFormData.numero_cns ?? ''} onChange={(e) => handleEditFieldChange('numero_cns', e.target.value)} /></div>
+              <div><Label htmlFor="edit-tipo-cartao">Tipo Cartão (D/P)</Label><Input id="edit-tipo-cartao" value={editFormData.tipo_cartao ?? ''} onChange={(e) => handleEditFieldChange('tipo_cartao', e.target.value.toUpperCase())} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'vacinas' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="edit-nome-vacina">Nome Vacina</Label><Input id="edit-nome-vacina" value={editFormData.nome_vacina ?? ''} onChange={(e) => handleEditFieldChange('nome_vacina', e.target.value)} /></div>
+              <div><Label htmlFor="edit-data-aplicacao">Data Aplicação</Label><Input id="edit-data-aplicacao" value={editFormData.data_aplicacao ?? ''} onChange={(e) => handleEditFieldChange('data_aplicacao', e.target.value)} /></div>
+              <div><Label htmlFor="edit-lote-vacina">Lote</Label><Input id="edit-lote-vacina" value={editFormData.lote_vacina ?? ''} onChange={(e) => handleEditFieldChange('lote_vacina', e.target.value)} /></div>
+              <div><Label htmlFor="edit-status-vacina">Status</Label><Input id="edit-status-vacina" value={editFormData.status ?? ''} onChange={(e) => handleEditFieldChange('status', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'auxilioEmergencial' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="edit-parcela">Parcela</Label><Input id="edit-parcela" value={editFormData.parcela ?? ''} onChange={(e) => handleEditFieldChange('parcela', e.target.value)} /></div>
+              <div><Label htmlFor="edit-mes-disp">Mês Disponibilização</Label><Input id="edit-mes-disp" value={editFormData.mes_disponibilizacao ?? ''} onChange={(e) => handleEditFieldChange('mes_disponibilizacao', e.target.value)} /></div>
+              <div><Label htmlFor="edit-enquadramento">Enquadramento</Label><Input id="edit-enquadramento" value={editFormData.enquadramento ?? ''} onChange={(e) => handleEditFieldChange('enquadramento', e.target.value)} /></div>
+              <div><Label htmlFor="edit-uf-aux">UF</Label><Input id="edit-uf-aux" value={editFormData.uf ?? ''} onChange={(e) => handleEditFieldChange('uf', e.target.value)} /></div>
+              <div className="md:col-span-2"><Label htmlFor="edit-valor-beneficio">Valor Benefício</Label><Input id="edit-valor-beneficio" value={editFormData.valor_beneficio ?? ''} onChange={(e) => handleEditFieldChange('valor_beneficio', e.target.value)} /></div>
+            </div>
+          )}
+
+          {editModalConfig?.section === 'operadoraVivo' && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div><Label htmlFor="edit-vivo-telefone">Telefone</Label><Input id="edit-vivo-telefone" value={editFormData.telefone ?? ''} onChange={(e) => handleEditFieldChange('telefone', e.target.value)} /></div>
+              <div><Label htmlFor="edit-vivo-plano">Plano</Label><Input id="edit-vivo-plano" value={editFormData.plano ?? ''} onChange={(e) => handleEditFieldChange('plano', e.target.value)} /></div>
+              <div><Label htmlFor="edit-vivo-uf">UF</Label><Input id="edit-vivo-uf" value={editFormData.uf ?? ''} onChange={(e) => handleEditFieldChange('uf', e.target.value)} /></div>
+              <div><Label htmlFor="edit-vivo-email">Email</Label><Input id="edit-vivo-email" value={editFormData.descricao_email ?? ''} onChange={(e) => handleEditFieldChange('descricao_email', e.target.value)} /></div>
+            </div>
+          )}
+
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setEditModalConfig(null)} disabled={savingEdit}>
+            <Button variant="outline" onClick={() => setEditModalConfig(null)} disabled={savingEdit || loadingEditData}>
               Cancelar
             </Button>
-            <Button onClick={handleSaveEditedSection} disabled={savingEdit}>
-              {savingEdit ? 'Salvando...' : 'Salvar'}
+            <Button onClick={handleSaveEditedSection} disabled={savingEdit || loadingEditData}>
+              {loadingEditData ? 'Carregando...' : savingEdit ? 'Salvando...' : 'Salvar'}
             </Button>
           </div>
         </DialogContent>
