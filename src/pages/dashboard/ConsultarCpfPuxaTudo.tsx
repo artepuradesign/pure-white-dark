@@ -1328,7 +1328,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
       };
 
       setEditFormData(mapBySection[section] || {});
-      setEditModalConfig({ section, title: `Editar ${section}` });
+      setEditModalConfig({ section, title: `Editar ${section} • Registro #${item.id}` });
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Erro ao carregar dados para edição.');
     } finally {
