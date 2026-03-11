@@ -1015,7 +1015,11 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
       }
 
       if (section === 'auxilioEmergencial') {
-        const item = auxiliosEmergenciais?.[0];
+        const selectedId = Number(selectedRecord?.id || 0);
+        const item = selectedId
+          ? auxiliosEmergenciais.find((aux) => Number(aux.id) === selectedId)
+          : auxiliosEmergenciais?.[0];
+
         if (!item?.id) throw new Error('Nenhum registro de auxílio emergencial para editar.');
 
         setEditFormData({
@@ -1024,9 +1028,10 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           mes_disponibilizacao: String(item.mes_disponibilizacao ?? ''),
           enquadramento: String(item.enquadramento ?? ''),
           uf: String(item.uf ?? ''),
+          observacao: String(item.observacao ?? ''),
           valor_beneficio: String(item.valor_beneficio ?? ''),
         });
-        setEditModalConfig({ section, title: 'Editar Auxílio Emergencial' });
+        setEditModalConfig({ section, title: `Editar Auxílio Emergencial • Registro #${item.id}` });
         return;
       }
 
