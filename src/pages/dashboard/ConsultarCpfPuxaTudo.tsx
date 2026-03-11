@@ -1210,8 +1210,18 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
       const section = editModalConfig.section;
       let updateOk = false;
 
-      if (section === 'dadosFinanceiros' || section === 'dadosBasicos' || section === 'tituloEleitor' || section === 'pis') {
-        const cpfPayload = section === 'pis' ? { pis: editFormData.pis ?? '' } : payload;
+      if (section === 'dadosFinanceiros' || section === 'dadosBasicos' || section === 'tituloEleitor' || section === 'score' || section === 'pis') {
+        const cpfPayload = section === 'pis'
+          ? { pis: editFormData.pis ?? '' }
+          : section === 'score'
+            ? {
+                score: Number(editFormData.score || 0),
+                csb8: Number(editFormData.csb8 || 0),
+                csb8_faixa: (editFormData.csb8_faixa ?? '').toUpperCase().trim(),
+                csba: Number(editFormData.csba || 0),
+                csba_faixa: (editFormData.csba_faixa ?? '').toUpperCase().trim(),
+              }
+            : payload;
         const updateResponse = await baseCpfService.update(cpfId, cpfPayload);
         updateOk = !!updateResponse.success;
         if (!updateOk) throw new Error(updateResponse.error || 'Erro ao salvar alterações no banco.');
