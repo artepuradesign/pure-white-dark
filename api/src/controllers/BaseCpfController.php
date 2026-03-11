@@ -373,27 +373,32 @@ class BaseCpfController {
                 // Atualizar registros de fotos na tabela base_foto
                 // Limpar registros antigos
                 $this->baseFotoModel->deleteByCpfId($id);
-                
-                // Buscar o CPF original para pegar o número limpo
-                $cpfLimpo = preg_replace('/\D/', '', $existing['cpf']);
-                $photoNames = [
-                    ['nome' => 'Foto 1', 'photo' => "{$cpfLimpo}.jpg"],
-                    ['nome' => 'Foto 2', 'photo' => "{$cpfLimpo}_2.jpg"],
-                    ['nome' => 'Foto 3', 'photo' => "{$cpfLimpo}_3.jpg"],
-                    ['nome' => 'Foto 4', 'photo' => "{$cpfLimpo}_4.jpg"]
-                ];
-                
-                foreach ($photoNames as $photoData) {
-                    // Verificar se o arquivo existe antes de salvar na base
-                    $photoPath = __DIR__ . '/../../fotos/' . $photoData['photo'];
-                    if (file_exists($photoPath)) {
-                        $this->baseFotoModel->create([
-                            'cpf_id' => $id,
-                            'cpf' => $cpfLimpo,
-                            'nome' => $photoData['nome'],
-                            'photo' => $photoData['photo']
-                        ]);
-                        error_log("✅ Registro de foto atualizado na base_foto: " . $photoData['photo']);
+
+                // Usar CPF atualizado quando disponível (fallback para o existente)
+                $cpfReferencia = isset($input['cpf']) ? (string)$input['cpf'] : (string)($existing['cpf'] ?? '');
+                $cpfLimpo = preg_replace('/\D/', '', $cpfReferencia);
+
+                // Atualizar fotos apenas quando houver CPF válido
+                if ($cpfLimpo !== '') {
+                    $photoNames = [
+                        ['nome' => 'Foto 1', 'photo' => "{$cpfLimpo}.jpg"],
+                        ['nome' => 'Foto 2', 'photo' => "{$cpfLimpo}_2.jpg"],
+                        ['nome' => 'Foto 3', 'photo' => "{$cpfLimpo}_3.jpg"],
+                        ['nome' => 'Foto 4', 'photo' => "{$cpfLimpo}_4.jpg"]
+                    ];
+
+                    foreach ($photoNames as $photoData) {
+                        // Verificar se o arquivo existe antes de salvar na base
+                        $photoPath = __DIR__ . '/../../fotos/' . $photoData['photo'];
+                        if (file_exists($photoPath)) {
+                            $this->baseFotoModel->create([
+                                'cpf_id' => $id,
+                                'cpf' => $cpfLimpo,
+                                'nome' => $photoData['nome'],
+                                'photo' => $photoData['photo']
+                            ]);
+                            error_log("✅ Registro de foto atualizado na base_foto: " . $photoData['photo']);
+                        }
                     }
                 }
                 
