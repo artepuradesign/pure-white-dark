@@ -13,24 +13,10 @@ import type { BaseCns } from '@/services/baseCnsService';
 interface CnsSectionProps {
   cpfId?: number;
   onCountChange?: (count: number) => void;
+  onEdit?: () => void;
 }
-
-const formatBrazilianDate = (value?: string | null) => {
-  if (!value) return '';
-  const iso = parseISO(value);
-  if (isValid(iso)) return format(iso, 'dd/MM/yyyy');
-  const d = new Date(value);
-  if (isValid(d)) return format(d, 'dd/MM/yyyy');
-  return value;
-};
-
-const tipoLabel = (t?: string | null) => {
-  if (t === 'D') return 'Definitivo';
-  if (t === 'P') return 'Provisório';
-  return '';
-};
-
-const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange }) => {
+...
+const CnsSection: React.FC<CnsSectionProps> = ({ cpfId, onCountChange, onEdit }) => {
   const { isLoading, error, getCnsByCpfId } = useBaseCns();
   const [items, setItems] = useState<BaseCns[]>([]);
 
