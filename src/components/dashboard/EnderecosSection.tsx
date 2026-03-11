@@ -11,9 +11,10 @@ import { toast } from "sonner";
 interface EnderecosSectionProps {
   cpfId?: number;
   onCountChange?: (count: number) => void;
+  onEdit?: () => void;
 }
 
-const EnderecosSection: React.FC<EnderecosSectionProps> = ({ cpfId, onCountChange }) => {
+const EnderecosSection: React.FC<EnderecosSectionProps> = ({ cpfId, onCountChange, onEdit }) => {
   const { isLoading, getEnderecosByCpfId } = useBaseEndereco();
   const [enderecos, setEnderecos] = useState<BaseEndereco[]>([]);
   const [didLoad, setDidLoad] = useState(false);
