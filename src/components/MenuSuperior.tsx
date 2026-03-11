@@ -32,8 +32,9 @@ const MenuSuperior = () => {
   const { panelMenus } = usePanelMenus();
   const { config: liquidGlassConfig } = useLiquidGlass();
 
-  // Verificar se está no dashboard
+  // Verificar páginas atuais para exibir links contextuais
   const isDashboardPage = location.pathname.startsWith('/dashboard');
+  const isHomePage = location.pathname === '/';
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
