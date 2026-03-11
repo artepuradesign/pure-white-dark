@@ -1156,15 +1156,90 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
         };
       }
 
-      const updateResponse = await baseCpfService.update(cpfId, payload);
-      if (!updateResponse.success) {
-        throw new Error(updateResponse.error || 'Erro ao salvar alterações no banco.');
+      const section = editModalConfig.section;
+      let updateOk = false;
+
+      if (section === 'dadosFinanceiros' || section === 'dadosBasicos' || section === 'tituloEleitor' || section === 'pis') {
+        const cpfPayload = section === 'pis' ? { pis: editFormData.pis ?? '' } : payload;
+        const updateResponse = await baseCpfService.update(cpfId, cpfPayload);
+        updateOk = !!updateResponse.success;
+        if (!updateOk) throw new Error(updateResponse.error || 'Erro ao salvar alterações no banco.');
+      } else {
+        const recordId = Number(editFormData._record_id || 0);
+        if (!recordId) throw new Error('Registro inválido para atualização desta seção.');
+
+        if (section === 'telefones') {
+          const res = await baseTelefoneService.update(recordId, {
+            ddd: editFormData.ddd ?? '',
+            telefone: editFormData.telefone ?? '',
+            tipo_texto: editFormData.tipo_texto as any,
+          });
+          updateOk = !!res.success;
+        } else if (section === 'emails') {
+          const res = await baseEmailService.update(recordId, {
+            email: (editFormData.email ?? '').toLowerCase().trim(),
+            score_email: editFormData.score_email as any,
+            email_pessoal: editFormData.email_pessoal as any,
+          });
+          updateOk = !!res.success;
+        } else if (section === 'enderecos') {
+          const res = await baseEnderecoService.update(recordId, {
+            cep: editFormData.cep ?? '',
+            logradouro: (editFormData.logradouro ?? '').toUpperCase().trim(),
+            numero: editFormData.numero ?? '',
+            complemento: (editFormData.complemento ?? '').toUpperCase().trim(),
+            bairro: (editFormData.bairro ?? '').toUpperCase().trim(),
+            cidade: (editFormData.cidade ?? '').toUpperCase().trim(),
+            uf: (editFormData.uf ?? '').toUpperCase().trim(),
+          });
+          updateOk = !!res.success;
+        } else if (section === 'parentes') {
+          const res = await baseParenteService.update(recordId, {
+            nome_vinculo: (editFormData.nome_vinculo ?? '').toUpperCase().trim(),
+            vinculo: (editFormData.vinculo ?? '').toUpperCase().trim(),
+            cpf_vinculo: (editFormData.cpf_vinculo ?? '').replace(/\D/g, ''),
+          });
+          updateOk = !!res.success;
+        } else if (section === 'cns') {
+          const res = await baseCnsService.update(recordId, {
+            numero_cns: (editFormData.numero_cns ?? '').replace(/\D/g, ''),
+            tipo_cartao: (editFormData.tipo_cartao ?? 'D') as any,
+          });
+          updateOk = !!res.success;
+        } else if (section === 'vacinas') {
+          const res = await baseVacinaService.update(recordId, {
+            nome_vacina: (editFormData.nome_vacina ?? '').toUpperCase().trim(),
+            data_aplicacao: editFormData.data_aplicacao ?? '',
+            lote_vacina: (editFormData.lote_vacina ?? '').toUpperCase().trim(),
+            status: (editFormData.status ?? '').toUpperCase().trim(),
+          });
+          updateOk = !!res.success;
+        } else if (section === 'auxilioEmergencial') {
+          const res = await baseAuxilioEmergencialService.update(recordId, {
+            parcela: editFormData.parcela ?? '',
+            mes_disponibilizacao: editFormData.mes_disponibilizacao ?? '',
+            enquadramento: (editFormData.enquadramento ?? '').toUpperCase().trim(),
+            uf: (editFormData.uf ?? '').toUpperCase().trim(),
+            valor_beneficio: Number(editFormData.valor_beneficio || 0),
+          });
+          updateOk = !!res.success;
+        } else if (section === 'operadoraVivo') {
+          const res = await baseVivoService.update(recordId, {
+            telefone: editFormData.telefone ?? '',
+            plano: (editFormData.plano ?? '').toUpperCase().trim(),
+            uf: (editFormData.uf ?? '').toUpperCase().trim(),
+            descricao_email: (editFormData.descricao_email ?? '').toLowerCase().trim(),
+          });
+          updateOk = !!res.success;
+        }
+
+        if (!updateOk) throw new Error('Erro ao salvar alterações no banco.');
       }
 
       setResult((prev) => {
         if (!prev) return prev;
 
-        if (editModalConfig.section === 'dadosFinanceiros') {
+        if (section === 'dadosFinanceiros') {
           return {
             ...prev,
             poder_aquisitivo: editFormData.poder_aquisitivo ?? '',
@@ -1173,7 +1248,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           };
         }
 
-        if (editModalConfig.section === 'dadosBasicos') {
+        if (section === 'dadosBasicos') {
           const normalizedCpf = (editFormData.cpf ?? '').replace(/\D/g, '').trim();
 
           return {
@@ -1197,13 +1272,30 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           };
         }
 
-        return {
-          ...prev,
-          titulo_eleitor: editFormData.titulo_eleitor ?? '',
-          zona: editFormData.zona ?? '',
-          secao: editFormData.secao ?? '',
-        };
+        if (section === 'tituloEleitor') {
+          return {
+            ...prev,
+            titulo_eleitor: editFormData.titulo_eleitor ?? '',
+            zona: editFormData.zona ?? '',
+            secao: editFormData.secao ?? '',
+          };
+        }
+
+        if (section === 'pis') {
+          return {
+            ...prev,
+            pis: editFormData.pis ?? '',
+          };
+        }
+
+        return prev;
       });
+
+      if (section === 'auxilioEmergencial') {
+        await getAuxiliosEmergenciaisByCpfId(cpfId);
+      }
+
+      setSectionsRefreshKey((prev) => prev + 1);
 
       toast.success('Dados atualizados no banco com sucesso!');
       setEditModalConfig(null);
