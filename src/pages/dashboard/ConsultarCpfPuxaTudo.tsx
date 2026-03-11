@@ -4409,7 +4409,8 @@ Todos os direitos reservados.`;
                 key={`enderecos-${sectionsRefreshKey}`}
                 cpfId={result.id}
                 onCountChange={setEnderecosCount}
-                onEdit={isSupportOrAdmin ? () => openEditModal('enderecos') : undefined}
+                onAddRecord={isSupportOrAdmin ? () => openAddSectionModal('enderecos') : undefined}
+                onEditRecord={isSupportOrAdmin ? (record) => openEditModal('enderecos', record) : undefined}
               />
             </div>
           )}
