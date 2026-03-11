@@ -92,7 +92,7 @@ import { baseParenteService } from '@/services/baseParenteService';
 import { baseCnsService } from '@/services/baseCnsService';
 import { baseVacinaService } from '@/services/baseVacinaService';
 import { baseVivoService } from '@/services/baseVivoService';
-import { baseAuxilioEmergencialService, BaseAuxilioEmergencial } from '@/services/baseAuxilioEmergencialService';
+import { baseAuxilioEmergencialService } from '@/services/baseAuxilioEmergencialService';
 
 // Função melhorada para consultar CPF e registrar com debug robusto
 const consultarCPFComRegistro = async (
