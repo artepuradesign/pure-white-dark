@@ -825,6 +825,7 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
 
   const [editModalConfig, setEditModalConfig] = useState<EditModalConfig | null>(null);
   const [editFormData, setEditFormData] = useState<Record<string, string>>({});
+  const [savingEdit, setSavingEdit] = useState(false);
 
   // Carregar título/descrição do módulo (do cadastro)
   useEffect(() => {
@@ -983,32 +984,41 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
     setEditFormData((prev) => ({ ...prev, [field]: value }));
   };
 
-  const handleSaveEditedSection = () => {
-    if (!editModalConfig) return;
+  const handleSaveEditedSection = async () => {
+    if (!editModalConfig || !result) return;
 
-    setResult((prev) => {
-      if (!prev) return prev;
+    setSavingEdit(true);
+
+    try {
+      let cpfId = result.id;
+
+      if (!cpfId && result.cpf) {
+        const lookup = await baseCpfService.getByCpf(String(result.cpf).replace(/\D/g, ''));
+        if (lookup.success && lookup.data?.id) {
+          cpfId = lookup.data.id;
+        }
+      }
+
+      if (!cpfId) {
+        throw new Error('Não foi possível identificar o registro para salvar no banco.');
+      }
+
+      let payload: Record<string, any> = {};
 
       if (editModalConfig.section === 'dadosFinanceiros') {
-        return {
-          ...prev,
+        payload = {
           poder_aquisitivo: editFormData.poder_aquisitivo ?? '',
           renda: editFormData.renda ?? '',
           fx_poder_aquisitivo: editFormData.fx_poder_aquisitivo ?? '',
         };
-      }
-
-      if (editModalConfig.section === 'dadosBasicos') {
-        return {
-          ...prev,
-          cpf: editFormData.cpf ?? '',
+      } else if (editModalConfig.section === 'dadosBasicos') {
+        payload = {
+          cpf: (editFormData.cpf ?? '').replace(/\D/g, ''),
           nome: editFormData.nome ?? '',
           data_nascimento: editFormData.data_nascimento ?? '',
           sexo: editFormData.sexo ?? '',
           mae: editFormData.mae ?? '',
-          nome_mae: editFormData.mae ?? '',
           pai: editFormData.pai ?? '',
-          nome_pai: editFormData.pai ?? '',
           estado_civil: editFormData.estado_civil ?? '',
           rg: editFormData.rg ?? '',
           cbo: editFormData.cbo ?? '',
@@ -1018,18 +1028,69 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
           renda: editFormData.renda ?? '',
           titulo_eleitor: editFormData.titulo_eleitor ?? '',
         };
+      } else {
+        payload = {
+          titulo_eleitor: editFormData.titulo_eleitor ?? '',
+          zona: editFormData.zona ?? '',
+          secao: editFormData.secao ?? '',
+        };
       }
 
-      return {
-        ...prev,
-        titulo_eleitor: editFormData.titulo_eleitor ?? '',
-        zona: editFormData.zona ?? '',
-        secao: editFormData.secao ?? '',
-      };
-    });
+      const updateResponse = await baseCpfService.update(cpfId, payload);
+      if (!updateResponse.success) {
+        throw new Error(updateResponse.error || 'Erro ao salvar alterações no banco.');
+      }
 
-    toast.success('Dados atualizados na tela!');
-    setEditModalConfig(null);
+      setResult((prev) => {
+        if (!prev) return prev;
+
+        if (editModalConfig.section === 'dadosFinanceiros') {
+          return {
+            ...prev,
+            poder_aquisitivo: editFormData.poder_aquisitivo ?? '',
+            renda: editFormData.renda ?? '',
+            fx_poder_aquisitivo: editFormData.fx_poder_aquisitivo ?? '',
+          };
+        }
+
+        if (editModalConfig.section === 'dadosBasicos') {
+          return {
+            ...prev,
+            cpf: editFormData.cpf ?? '',
+            nome: editFormData.nome ?? '',
+            data_nascimento: editFormData.data_nascimento ?? '',
+            sexo: editFormData.sexo ?? '',
+            mae: editFormData.mae ?? '',
+            nome_mae: editFormData.mae ?? '',
+            pai: editFormData.pai ?? '',
+            nome_pai: editFormData.pai ?? '',
+            estado_civil: editFormData.estado_civil ?? '',
+            rg: editFormData.rg ?? '',
+            cbo: editFormData.cbo ?? '',
+            orgao_emissor: editFormData.orgao_emissor ?? '',
+            uf_emissao: editFormData.uf_emissao ?? '',
+            data_obito: editFormData.data_obito ?? '',
+            renda: editFormData.renda ?? '',
+            titulo_eleitor: editFormData.titulo_eleitor ?? '',
+          };
+        }
+
+        return {
+          ...prev,
+          titulo_eleitor: editFormData.titulo_eleitor ?? '',
+          zona: editFormData.zona ?? '',
+          secao: editFormData.secao ?? '',
+        };
+      });
+
+      toast.success('Dados atualizados no banco com sucesso!');
+      setEditModalConfig(null);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Erro ao atualizar dados.';
+      toast.error(message);
+    } finally {
+      setSavingEdit(false);
+    }
   };
 
   // Carregar últimas 5 consultas CPF para exibir na seção de histórico
