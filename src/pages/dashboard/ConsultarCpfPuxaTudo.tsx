@@ -947,46 +947,152 @@ const ConsultarCpfPuxaTudo: React.FC<ConsultarCpfPuxaTudoProps> = ({
     };
   };
 
-  const openEditModal = (section: EditableSection) => {
-    if (!result) return;
+  const openEditModal = async (section: EditableSection) => {
+    if (!result?.id) return;
 
-    if (section === 'dadosFinanceiros') {
-      setEditFormData({
-        poder_aquisitivo: String(result.poder_aquisitivo ?? ''),
-        renda: String(result.renda ?? ''),
-        fx_poder_aquisitivo: String(result.fx_poder_aquisitivo ?? ''),
-      });
-      setEditModalConfig({ section, title: 'Editar Dados Financeiros' });
-      return;
+    try {
+      setLoadingEditData(true);
+
+      if (section === 'dadosFinanceiros') {
+        setEditFormData({
+          poder_aquisitivo: String(result.poder_aquisitivo ?? ''),
+          renda: String(result.renda ?? ''),
+          fx_poder_aquisitivo: String(result.fx_poder_aquisitivo ?? ''),
+        });
+        setEditModalConfig({ section, title: 'Editar Dados Financeiros' });
+        return;
+      }
+
+      if (section === 'dadosBasicos') {
+        setEditFormData({
+          cpf: String(result.cpf ?? ''),
+          nome: String(result.nome ?? ''),
+          data_nascimento: String(result.data_nascimento ?? ''),
+          sexo: String(result.sexo ?? ''),
+          mae: String((result.mae || result.nome_mae) ?? ''),
+          pai: String((result.pai || result.nome_pai) ?? ''),
+          estado_civil: String(result.estado_civil ?? ''),
+          rg: String(result.rg ?? ''),
+          cbo: String(result.cbo ?? ''),
+          orgao_emissor: String(result.orgao_emissor ?? ''),
+          uf_emissao: String(result.uf_emissao ?? ''),
+          data_obito: String(result.data_obito ?? ''),
+          renda: String(result.renda ?? ''),
+          titulo_eleitor: String(result.titulo_eleitor ?? ''),
+        });
+        setEditModalConfig({ section, title: 'Editar Dados Básicos' });
+        return;
+      }
+
+      if (section === 'tituloEleitor') {
+        setEditFormData({
+          titulo_eleitor: String(result.titulo_eleitor ?? ''),
+          zona: String(result.zona ?? ''),
+          secao: String(result.secao ?? ''),
+        });
+        setEditModalConfig({ section, title: 'Editar Título de Eleitor' });
+        return;
+      }
+
+      if (section === 'pis') {
+        setEditFormData({ pis: String(result.pis ?? '') });
+        setEditModalConfig({ section, title: 'Editar PIS' });
+        return;
+      }
+
+      if (section === 'auxilioEmergencial') {
+        const item = auxiliosEmergenciais?.[0];
+        if (!item?.id) throw new Error('Nenhum registro de auxílio emergencial para editar.');
+
+        setEditFormData({
+          _record_id: String(item.id),
+          parcela: String(item.parcela ?? ''),
+          mes_disponibilizacao: String(item.mes_disponibilizacao ?? ''),
+          enquadramento: String(item.enquadramento ?? ''),
+          uf: String(item.uf ?? ''),
+          valor_beneficio: String(item.valor_beneficio ?? ''),
+        });
+        setEditModalConfig({ section, title: 'Editar Auxílio Emergencial' });
+        return;
+      }
+
+      const loaders: Record<Exclude<EditableSection, 'dadosFinanceiros' | 'dadosBasicos' | 'tituloEleitor' | 'pis' | 'auxilioEmergencial'>, () => Promise<any[]>> = {
+        telefones: async () => (await baseTelefoneService.getByCpfId(result.id)).data || [],
+        emails: async () => (await baseEmailService.getByCpfId(result.id)).data || [],
+        enderecos: async () => (await baseEnderecoService.getByCpfId(result.id)).data || [],
+        parentes: async () => {
+          const res = await baseParenteService.getByCpfId(result.id);
+          const raw = res.data as any;
+          if (Array.isArray(raw)) return raw;
+          if (Array.isArray(raw?.data)) return raw.data;
+          return [];
+        },
+        cns: async () => (await baseCnsService.getByCpfId(result.id)).data || [],
+        vacinas: async () => (await baseVacinaService.getByCpfId(result.id)).data || [],
+        operadoraVivo: async () => (await baseVivoService.getByCpfId(result.id)).data || [],
+      };
+
+      const records = await loaders[section]();
+      const item = records?.[0];
+      if (!item?.id) throw new Error('Nenhum registro encontrado para edição nesta seção.');
+
+      const mapBySection: Record<string, Record<string, string>> = {
+        telefones: {
+          _record_id: String(item.id),
+          ddd: String(item.ddd ?? ''),
+          telefone: String(item.telefone ?? ''),
+          tipo_texto: String(item.tipo_texto ?? ''),
+        },
+        emails: {
+          _record_id: String(item.id),
+          email: String(item.email ?? ''),
+          score_email: String(item.score_email ?? ''),
+          email_pessoal: String(item.email_pessoal ?? ''),
+        },
+        enderecos: {
+          _record_id: String(item.id),
+          cep: String(item.cep ?? ''),
+          logradouro: String(item.logradouro ?? ''),
+          numero: String(item.numero ?? ''),
+          complemento: String(item.complemento ?? ''),
+          bairro: String(item.bairro ?? ''),
+          cidade: String(item.cidade ?? ''),
+          uf: String(item.uf ?? ''),
+        },
+        parentes: {
+          _record_id: String(item.id),
+          nome_vinculo: String(item.nome_vinculo ?? ''),
+          vinculo: String(item.vinculo ?? ''),
+          cpf_vinculo: String(item.cpf_vinculo ?? ''),
+        },
+        cns: {
+          _record_id: String(item.id),
+          numero_cns: String(item.numero_cns ?? ''),
+          tipo_cartao: String(item.tipo_cartao ?? ''),
+        },
+        vacinas: {
+          _record_id: String(item.id),
+          nome_vacina: String(item.nome_vacina ?? ''),
+          data_aplicacao: String(item.data_aplicacao ?? ''),
+          lote_vacina: String(item.lote_vacina ?? ''),
+          status: String(item.status ?? ''),
+        },
+        operadoraVivo: {
+          _record_id: String(item.id),
+          telefone: String(item.telefone ?? ''),
+          plano: String(item.plano ?? ''),
+          uf: String(item.uf ?? ''),
+          descricao_email: String(item.descricao_email ?? ''),
+        },
+      };
+
+      setEditFormData(mapBySection[section] || {});
+      setEditModalConfig({ section, title: `Editar ${section}` });
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Erro ao carregar dados para edição.');
+    } finally {
+      setLoadingEditData(false);
     }
-
-    if (section === 'dadosBasicos') {
-      setEditFormData({
-        cpf: String(result.cpf ?? ''),
-        nome: String(result.nome ?? ''),
-        data_nascimento: String(result.data_nascimento ?? ''),
-        sexo: String(result.sexo ?? ''),
-        mae: String((result.mae || result.nome_mae) ?? ''),
-        pai: String((result.pai || result.nome_pai) ?? ''),
-        estado_civil: String(result.estado_civil ?? ''),
-        rg: String(result.rg ?? ''),
-        cbo: String(result.cbo ?? ''),
-        orgao_emissor: String(result.orgao_emissor ?? ''),
-        uf_emissao: String(result.uf_emissao ?? ''),
-        data_obito: String(result.data_obito ?? ''),
-        renda: String(result.renda ?? ''),
-        titulo_eleitor: String(result.titulo_eleitor ?? ''),
-      });
-      setEditModalConfig({ section, title: 'Editar Dados Básicos' });
-      return;
-    }
-
-    setEditFormData({
-      titulo_eleitor: String(result.titulo_eleitor ?? ''),
-      zona: String(result.zona ?? ''),
-      secao: String(result.secao ?? ''),
-    });
-    setEditModalConfig({ section, title: 'Editar Título de Eleitor' });
   };
 
   const handleEditFieldChange = (field: string, value: string) => {
